@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Duolingo Scraper (Firefox)",
+  "version": "1.0",
+  "permissions": ["webNavigation"],
+  "host_permissions": [
+    "https://www.duolingo.com/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "scripts": ["src/background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.duolingo.com/*"],
+      "js": ["src/utils.js", "src/logInfo.js", "src/scraper.js", "src/content.js", "src/challenges.js"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "duoscraper@example.com"
+    }
+  }
+}
