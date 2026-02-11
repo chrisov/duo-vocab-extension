@@ -1,36 +1,57 @@
 // console.log('[DUO-EXT] logInfo.js loaded');
 
-// Track lesson clicks
-function trackLessonClick(event) {
-    const button = event.target.closest('button[data-test*="skill-path-level"]');
-    if (!button) return;
+// Extract and save learn page information
+function extractLearnPageInfo() {
+    // Prefer shared language detection, fall back to URL/guidebook data
+    let languageCode = getCurrentLanguage();
 
-    const dataTest = button.getAttribute('data-test') || '';
-    const match = dataTest.match(/skill-path-level-(\d+)/);
-    if (!match) return;
+    // Fallback 1: Try to extract from pathname (e.g., /learn/pt)
+    if (!languageCode) {
+        const pathMatch = window.location.pathname.match(/\/learn\/([a-z]{2,3})/);
+        if (pathMatch) {
+            languageCode = pathMatch[1];
+        }
+    }
 
-    const levelNumber = match[1];
-    const skillPathSection = button.closest('[data-test^="skill-path-unit"]');
-    const unitMatch = skillPathSection?.getAttribute('data-test')?.match(/skill-path-unit-(\d+)/);
-    const unitNumber = unitMatch ? unitMatch[1] : 'unknown';
+    // Fallback 2: Try to get from guidebook buttons
+    if (!languageCode) {
+        const guidebookButtons = document.querySelectorAll('[data-test*="guidebook"]');
 
-    // Extract language from page title (e.g., "Learn Spanish with lessons")
-    const titleText = document.title || '';
-    const languageMatch = titleText.match(/Learn (\w+) with/);
-    const language = languageMatch ? languageMatch[1] : 'Unknown';
-
-    const payload = {
-        type: 'lesson_click',
-        unit: unitNumber,
-        level: levelNumber,
-        language: language,
+        if (guidebookButtons.length > 0) {
+            const href = guidebookButtons[0].getAttribute('href') || '';
+            const langMatch = href.match(/\/guidebook\/([^/]+)\//);
+            if (langMatch) {
+                languageCode = langMatch[1];
+            }
+        }
+    }
+    
+    if (!languageCode) {
+        console.error('[DUO-EXT] Could not detect language code');
+        return;
+    }
+    
+    const sessionInfo = {
+        language: languageCode,
         timestamp: new Date().toISOString()
     };
-
-    fetch('http://localhost:5000/log-lesson', {
+    
+    // Send to backend to save in config/session.json
+    fetch('http://localhost:5000/save-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(sessionInfo)
     })
-    .catch(err => console.error("Error logging lesson:", err));
+    .catch(err => console.error('[DUO-EXT] Error saving session:', err));
+
+    console.log('[DUO-EXT] Session info: ', sessionInfo);
 }
+
+// Initialize learn page detection
+function initLearnPageDetection() {
+    // Extract info after DOM is ready (give page time to load)
+    setTimeout(() => {
+        extractLearnPageInfo();
+    }, 3500);
+}
+

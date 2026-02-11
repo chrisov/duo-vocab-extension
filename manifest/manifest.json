@@ -14,8 +14,20 @@
   "content_scripts": [
     {
       "matches": ["https://www.duolingo.com/*"],
-      "js": ["src/utils.js", "src/logInfo.js", "src/scraper.js", "src/content.js", "src/challenges.js"]
+      "js": [
+        "src/logInfo.js",
+        "src/utils.js",
+        "src/challenges.js",
+        "src/scraper.js",
+        "src/main.js"
+      ]
     }
+  ],
+  "web_accessible_resources": [
+  {
+    "resources": ["src/utils.js", "src/scraper.js", "src/logInfo.js", "src/challenges.js"],
+    "matches": ["https://www.duolingo.com/*"]
+  }
   ],
   "browser_specific_settings": {
     "gecko": {
