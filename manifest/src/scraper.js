@@ -3,7 +3,7 @@
 let listening = true;
 let isProcessing = false;
 
-function handleInteraction(event) {
+function handleInteraction(event, words) {
     // If we are currently in a timeout/processing, ignore new inputs
     if (isProcessing)
         return;
@@ -31,75 +31,39 @@ function handleInteraction(event) {
     console.log(`[DUO-EXT] ${event.type === 'click' ? 'Mouse' : 'Enter'} trigger: Extracting...`);
 
     setTimeout(() => {
-        extractWords();
+        extractWords(words);
         isProcessing = false; // Reset flag after extraction
     }, 150);
 }
 
-
-/**
- * Handle click on check/continue button 
- * */ 
-// function handleCheckButtonClick(event) {
-//     const nextButton = document.querySelector('[data-test="player-next"]');
-//     if (!nextButton)
-//         return;
-
-//     const clickedInsideButton = !!event.target.closest('[data-test="player-next"]');
-//     if (!clickedInsideButton)
-//         return;
-    
-//     console.log('[DUO-EXT] Check button clicked, extracting vocabulary...');
-    
-//     // Small delay to let the DOM update after the click
-//     setTimeout(() => {
-//         extractWords();
-//     }, 100);
-// }
-
-// Handle Enter key for check/continue
-// function handleCheckKeydown(event) {
-//     if (event.key !== 'Enter')
-//         return;
-
-//     const nextButton = document.querySelector('[data-test="player-next"]');
-//     if (!nextButton)
-//         return;
-
-//     const activeElement = document.activeElement;
-//     if (activeElement && !activeElement.closest('[data-test="player-next"]'))
-//         return;
-
-//     console.log('[DUO-EXT] Enter pressed, extracting vocabulary...');
-
-//     setTimeout(() => {
-//         extractWords();
-//     }, 100);
-// }
-
-function startContinuousScrape() {
+function startContinuousScrape(words) {
     if (!listening)
         return;
     listening = false;
     console.log('[DUO-EXT] Attaching click listener to player-next button');
-    document.addEventListener('click', handleInteraction, true);
-    document.addEventListener('keydown', handleInteraction, true);
+    document.addEventListener('click', (event) => handleInteraction(event, words), true);
+    document.addEventListener('keydown', (event) => handleInteraction(event, words), true);
     
     // Extract words from the first challenge after a longer delay for DOM to load
     setTimeout(() => {
         console.log('[DUO-EXT] Extracting first challenge...');
-        extractWords();
+        extractWords(words);
     }, 1500);
 }
 
-function stopContinuousScrape() {
+function stopContinuousScrape(words) {
     if (listening)
         return;
     listening = true;
     console.log('[DUO-EXT] Removing click listener from player-next button');
-    document.removeEventListener('click', handleInteraction, true);
-    document.removeEventListener('keydown', handleInteraction, true);
+    document.removeEventListener('click', (event) => handleInteraction(event, words), true);
+    document.removeEventListener('keydown', (event) => handleInteraction(event, words), true);
     
-    // TODO: Add the extraction of the lesson sector/unit/etc
-
+    // Send extracted vocabulary to backend
+    if (words.size > 0) {
+        sendVocabularyToBackend(Array.from(words));
+        resetVocabulary(words)
+    } else {
+        console.log('[DUO-EXT] No vocabulary extracted from this lesson');
+    }
 }

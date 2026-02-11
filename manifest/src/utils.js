@@ -1,30 +1,8 @@
 // Utility functions for exercise detection
 // console.log('[DUO-EXT] utils.js loaded');
 
-// Detect exercise type based on data-test attributes
-function detectExerciseType() {
-    if (document.querySelector('[data-test="challenge-select"]'))
-        return 'select-challenge';
-    if (document.querySelector('[data-test="challenge-translate"]'))
-        return 'translate-challenge';
-    if (document.querySelector('[data-test="challenge-tap"]'))
-        return 'tap-challenge';
-    if (document.querySelector('[data-test="challenge-listen"]'))
-        return 'listen-challenge';
-    if (document.querySelector('[data-test="challenge-speak"]'))
-        return 'speak-challenge';
-    if (document.querySelector('[data-test="challenge-match"]'))
-        return 'match-challenge';
-    if (document.querySelector('[data-test="challenge-name"]'))
-        return 'name-challenge';
-    if (document.querySelector('[data-test="challenge-definition"]'))
-        return 'definition-challenge';
-    if (document.querySelector('[data-test="challenge-complete-reverse-translation"]'))
-        return 'complete-reverse-translation';
-    if (document.querySelector('[data-test="challenge-judge"]'))
-        return 'judge-challenge';
-    return 'unknown';
-}
+// Configure your backend endpoint here
+const BACKEND_URL = 'http://localhost:5000/save-vocab'; // Change this to your backend URL
 
 /**
  * Get the current challenge type from the DOM
@@ -91,4 +69,39 @@ function getCurrentLanguage() {
     }
     
     return languageCode;
+}
+
+
+function sendVocabularyToBackend(vocabularyList) {
+    console.log(`[DUO-EXT] Sending ${vocabularyList.length} word(s) to backend...`);
+    
+    fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            vocabulary: vocabularyList,
+            timestamp: new Date().toISOString(),
+            language: getCurrentLanguage()
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('[DUO-EXT] Vocabulary sent successfully:', data);
+    })
+    .catch(error => {
+        console.error('[DUO-EXT] Error sending vocabulary to backend:', error);
+    });
+}
+
+// Clear vocabulary for next lesson
+function resetVocabulary(words) {
+    words.clear();
+    console.log('[DUO-EXT] Vocabulary collection reset');
 }

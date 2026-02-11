@@ -2,6 +2,8 @@
 // console.log('[DUO-EXT] Current URL:', window.location.href);
 // console.log('[DUO-EXT] Current pathname:', window.location.pathname);
 
+let words = new Set();
+
 // Update your listener to start the observer when a lesson starts
 chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "URL_CHANGED") {
@@ -19,11 +21,11 @@ function handleLessonStateChange() {
     
     if (pathname.includes('/lesson')) {
         console.log('[DUO-EXT] On lesson page, starting vocabulary scraper');
-        startContinuousScrape();
+        startContinuousScrape(words);
     } else if (pathname.includes('/learn')) {
         console.log('[DUO-EXT] On learn page, extracting session info');
         try {
-            stopContinuousScrape();
+            stopContinuousScrape(words);
         } catch (e) {
             console.log('[DUO-EXT] Error stopping scraper:', e);
         }
@@ -31,7 +33,7 @@ function handleLessonStateChange() {
     } else {
         console.log('[DUO-EXT] On other page, cleaning up');
         try {
-            stopContinuousScrape();
+            stopContinuousScrape(words);
         } catch (e) {
             console.log('[DUO-EXT] Error cleaning up:', e);
         }
