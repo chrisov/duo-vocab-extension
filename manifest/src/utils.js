@@ -2,7 +2,7 @@
 // console.log('[DUO-EXT] utils.js loaded');
 
 // Configure your backend endpoint here
-const BACKEND_URL = 'http://localhost:5000/save-vocab'; // Change this to your backend URL
+const BACKEND_URL = 'http://localhost:5000/save-vocab';
 
 /**
  * Get the current challenge type from the DOM

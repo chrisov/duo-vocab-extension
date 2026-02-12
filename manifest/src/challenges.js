@@ -15,6 +15,8 @@ function extractWords(words) {
         localWords = gapFillChallenge(language);
     } else if (challengeType === 'translate') {
         localWords = translateChallenge(language);
+    } else if (challengeType === 'tapComplete') {
+        localWords = tapCompleteChallenge(language);
     }
     
     // Add extracted words to global vocabulary collection
@@ -108,5 +110,56 @@ function translateChallenge(language) {
         console.log('[DUO-EXT] No localWords found!');
     }
     
+    return localWords;
+}
+
+function tapCompleteChallenge (language) {
+    const localWords = new Set();
+
+    // Find the tapComplete challenge container
+    const tapCompleteContainer = document.querySelector('[data-test="challenge challenge-tapComplete"]');
+    if (!tapCompleteContainer) {
+        console.log('[DUO-EXT] tapComplete container not found');
+        return localWords;
+    }
+
+    // Extract words from hint-token elements only when lang matches the detected language
+    const hintTokenElements = tapCompleteContainer.querySelectorAll('[data-test="hint-token"]');
+    hintTokenElements.forEach(el => {
+        const langElement = el.closest('[lang]');
+        const tokenLang = langElement ? langElement.getAttribute('lang') : null;
+        if (!tokenLang || tokenLang === 'en' || tokenLang !== language) {
+            return;
+        }
+
+        const text = el.getAttribute('aria-label');
+        if (text && text.trim()) {
+            localWords.add(text.trim());
+        }
+    });
+
+    // Extract words from tap-token-text elements (word bank options), filtered by language
+    const tapTokenElements = tapCompleteContainer.querySelectorAll('[data-test="challenge-tap-token-text"]');
+    tapTokenElements.forEach(el => {
+        const langElement = el.closest('[lang]');
+        const tokenLang = langElement ? langElement.getAttribute('lang') : null;
+        if (!tokenLang || tokenLang === 'en' || tokenLang !== language) {
+            return;
+        }
+
+        const tokenText = el.textContent.trim();
+        if (!tokenText) {
+            return;
+        }
+        localWords.add(tokenText);
+    });
+
+    // Log the extracted words
+    if (localWords.size > 0) {
+        console.log(`[DUO-EXT] Extracted ${localWords.size} word(s):`, Array.from(localWords));
+    } else {
+        console.log('[DUO-EXT] No words found!');
+    }
+
     return localWords;
 }
