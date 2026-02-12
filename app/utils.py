@@ -7,12 +7,12 @@ CONFIG_DIR = Path("../config")
 PATHS_FILE = CONFIG_DIR / "paths.json"
 
 
-def safe_path_check(key: str) -> str:
+def safe_path_check(filepath: str) -> str:
 	"""
-	Loads the paths.json safely, checks and returns the requested JSON file.
+	Loads the paths.json safely, checks and returns the requested JSON filepath.
 		
-	:param key: The requested JSON file.
-	:type key: str
+	:param filepath: The requested JSON file.
+	:type filepath: str
 
 	:return: The path to the requested JSON file.
 	:rtype: str
@@ -29,27 +29,27 @@ def safe_path_check(key: str) -> str:
 	except json.JSONDecodeError as e:
 		raise ValueError("paths.json is empty or contains invalid JSON") from e
 
-	## Retrieves the key from the 
+	## Retrieves the filepath from the 
 	try:
-		data_path = Path(paths[key])
+		data_path = Path(paths[filepath])
 	except KeyError as e:
-		raise KeyError(f"'{key}' does not exist in paths.json") from e
+		raise KeyError(f"'{filepath}' does not exist in paths.json") from e
 	return data_path
 
 
 
-def safe_load_json(key: str) -> dict:
-	"""Loads JSON data for the given key using paths.json as a lookup.
+def safe_load_json(filepath: str) -> dict:
+	"""Loads JSON data for the given filepath using paths.json as a lookup.
 	
-	:param key: The JSON file to look for in the paths.json.
-	:type key: str
+	:param filepath: The JSON file to look for in the paths.json.
+	:type filepath: str
 
 	:return: The requested contents of the JSON file.
 	:rtype: dict
 	"""
 
 	## Loads the filepath
-	data_path = safe_path_check(key)
+	data_path = safe_path_check(filepath)
 
 	## Creates and init the requested file if not existing
 	if data_path.suffix == ".json":
@@ -69,23 +69,34 @@ def safe_load_json(key: str) -> dict:
 
 
 
-def safe_write_json(key: str, data: dict):
+def safe_write_json(filepath: str, data: dict):
 	"""
 	Writes data into a JSON file, using the paths.json as lookup.
 	
-	:param key: The requested JSON file.
-	:type key: str
+	:param filepath: The requested JSON file.
+	:type filepath: str
 	:param data: The data to be written.
 	:type data: dict
 	"""
 
 	## Loads the filepath
-	data_path = safe_path_check(key)
+	data_path = safe_path_check(filepath)
 
 	## Writes to the file
 	with open(data_path, "w", encoding='utf-8') as f:
 		json.dump(data, f, indent=2, ensure_ascii=False)
    
+
+
+
+def update_data(old: dict, new:dict):
+	
+	localVocab = {}
+	localVocab.update(old['vocabulary'])
+	localVocab.update(new['vocabulary'])
+	old['timestamp'] = new['timestamp']
+	old['vocabulary'] = localVocab
+
 
 
 def parse_request(required: list[str], optional: list[str] | None = None) -> tuple:

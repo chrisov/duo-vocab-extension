@@ -2,8 +2,10 @@ from flask import Flask
 from flask_cors import CORS
 from utils import safe_load_json, safe_write_json, parse_request
 
+
 app = Flask(__name__)
 CORS(app)
+
 
 @app.route('/save-vocab', methods=['POST'])
 def save_vocab() -> tuple:
@@ -14,18 +16,30 @@ def save_vocab() -> tuple:
     :rtype: tuple
     """
 
+    ## Loads existing vocabulary
     vocab_data = safe_load_json("VOCAB_PATH")
 
+    ## Accepts language data from server
     try:
         language, entry = parse_request(['language', 'timestamp', 'vocabulary'])
     except ValueError as e:
         return f"Error: {str(e)}", 400
 
-    vocab_data[language] = entry
+    ## Updates the vocabulary based on 'processed' value
+    if language not in vocab_data or vocab_data[language]['processed'] == True:
+        vocab_data[language] = entry
+        vocab_data[language]['processed'] = False
+    else:
+        localVocab = set()
+        localVocab.update(vocab_data[language]['vocabulary'])
+        localVocab.update(entry['vocabulary'])
+        vocab_data[language]['timestamp'] = entry['timestamp']
+        vocab_data[language]['vocabulary'] = list(localVocab)
 
     safe_write_json("VOCAB_PATH", vocab_data)
     
     return "Vocab sent succesfully", 200
+
 
 
 @app.route('/save-session', methods=['POST'])
@@ -54,6 +68,8 @@ def save_session() -> tuple:
     safe_write_json("SESSION_PATH", session_data)
 
     return "Session sent successfully", 200
+
+
 
 if __name__ == '__main__':
     app.run(port=5000)
