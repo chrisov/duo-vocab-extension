@@ -38,7 +38,7 @@ def safe_path_check(key: str) -> str:
 
 
 
-def safe_load_data(key: str) -> dict:
+def safe_load_json(key: str) -> dict:
 	"""Loads JSON data for the given key using paths.json as a lookup.
 	
 	:param key: The JSON file to look for in the paths.json.
@@ -51,20 +51,25 @@ def safe_load_data(key: str) -> dict:
 	## Loads the filepath
 	data_path = safe_path_check(key)
 
+	## Creates and init the requested file if not existing
+	if data_path.suffix == ".json":
+		data_path.parent.mkdir(parents=True, exist_ok=True)
+		if not data_path.exists():
+			print(f"'{data_path}': Non existing file, created on the spot.")
+			data_path.write_text("{}", encoding="utf-8")
+
 	## Returns the contents of the requested file
 	if data_path.is_file():
 		try:
 			return json.loads(data_path.read_text(encoding="utf-8"))
 		except json.JSONDecodeError:
 			print(f"'{data_path}': Invalid format, return an empty dict instead.")
-			return {}
-	else:
-		print(f"'{data_path}': Not a valid json file, return an empty dict instead.")
-		return {}
+			data_path.write_text("{}", encoding="utf-8")
+	return {}
 
 
 
-def safe_write_data(key: str, data: dict):
+def safe_write_json(key: str, data: dict):
 	"""
 	Writes data into a JSON file, using the paths.json as lookup.
 	
@@ -120,5 +125,9 @@ def parse_request(required: list[str], optional: list[str] | None = None) -> tup
 
 
 if __name__ == "__main__":
-	dict = safe_load_data("SESSION_PATH")
-	print(dict)
+	dict = safe_load_json("VOCAB_PATH")
+	print(f"VOCAB_PATH:\n{dict}'\n")
+	dict = safe_load_json("BACKEND_URL")
+	print(f"BACKEND_URL:\n{dict}'\n")
+	dict = safe_load_json("SESSION_PATH")
+	print(f"SESSION_PATH:\n{dict}'\n")
