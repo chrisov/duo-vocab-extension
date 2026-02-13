@@ -1,4 +1,5 @@
 import time
+from app.server_utils import load_data_from_json
 
 
 def timing_function(func):
@@ -35,3 +36,20 @@ def str_to_list(str:str) -> list[list]:
 		cols = [c.strip() for c in line.split(',')]
 		result.append(cols)
 	return result
+
+
+
+def get_active_session() -> str:
+	"""
+	Docstring for get_active_session
+	
+	:return: Description
+	:rtype: str
+	"""
+	
+	session_data = load_data_from_json("SESSION_PATH")
+	for language, info in session_data.items():
+		if isinstance(info, dict) and info.get("active") is True:
+			return language
+	return ""
+		

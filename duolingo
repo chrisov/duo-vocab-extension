@@ -1,1 +1,80 @@
-#! /usr/bin/env/bash
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/venv/bin/activate"
+cd "$SCRIPT_DIR"
+
+OPTIONS=(
+  "Practice Duolingo"
+  #"Practice Vocabulary"
+  "Practice daemon"
+  "Exit"
+)
+
+current=0
+
+draw_menu() {
+  clear
+  echo "=== Duo Teacher Menu ==="
+  echo
+  for i in "${!OPTIONS[@]}"; do
+    if [[ $i -eq $current ]]; then
+      printf " > %s\n" "${OPTIONS[$i]}"
+    else
+      printf "   %s\n" "${OPTIONS[$i]}"
+    fi
+  done
+}
+
+while true; do
+  draw_menu
+
+  # read 3 chars max without echo (-s), no newline (-n3)
+  IFS= read -rsn1 key
+  if [[ $key == $'\x1b' ]]; then
+    # possible arrow key: read the next two chars
+    read -rsn2 key
+    case "$key" in
+      "[A") # up
+        ((current--))
+        if (( current < 0 )); then current=$((${#OPTIONS[@]} - 1)); fi
+        ;;
+      "[B") # down
+        ((current++))
+        if (( current >= ${#OPTIONS[@]} )); then current=0; fi
+        ;;
+	esac
+	elif [[ $key == "" ]]; then
+  # Enter pressed
+  case $current in
+    0)
+		# Start server in background as a module (so `from app.utils` works)
+		python3 -m app.server &
+		# python3 -m daemon.main &
+		server_pid=$!
+
+    	# Open Duolingo in a dedicated Firefox profile/instance
+		firefox -P duoteacher --no-remote "https://www.duolingo.com/learn" &
+			browser_pid=$!
+
+		# Wait until that Firefox instance exits
+		wait "$browser_pid"
+
+		# Then stop the server and return to the menu
+		kill "$server_pid" 2>/dev/null || true
+		wait "$server_pid" 2>/dev/null || true
+      	;;
+    1)
+		python3 -m daemon.main
+      ;;
+    2)
+		deactivate
+		echo "Exiting"
+		break
+		;;
+  esac
+
+  # Optional pause before re-drawing menu (skip if you prefer immediate refresh)
+  read -rp "Press any key to continue..." -n1
+	fi
+done

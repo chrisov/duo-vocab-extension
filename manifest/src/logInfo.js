@@ -33,7 +33,8 @@ function extractLearnPageInfo() {
     
     const sessionInfo = {
         language: languageCode,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        active: true
     };
     
     // Send to backend to save in config/session.json

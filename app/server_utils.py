@@ -126,6 +126,24 @@ def parse_request(required: list[str], optional: list[str] | None = None) -> tup
 
 
 
+def set_active_session(data: dict, lang: str):
+	"""
+	Docstring for set_inactive_language
+	
+	:param data: Description
+	:type data: dict
+	:param lang: Description
+	:type lang: str
+	"""
+
+	for key in data:
+		if key == lang:
+			data[key]['active'] = True
+			continue
+		if isinstance(data.get(key), dict):
+			data[key]['active'] = False
+
+
 if __name__ == "__main__":
 	dict = load_data_from_json("VOCAB_PATH")
 	print(f"VOCAB_PATH:\n{dict}'\n")

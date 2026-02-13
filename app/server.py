@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from app.utils import load_data_from_json, write_data_to_json, parse_request
+from app.server_utils import load_data_from_json, write_data_to_json, parse_request, set_active_session
 
 
 app = Flask(__name__)
@@ -25,16 +25,15 @@ def save_vocab() -> tuple:
     except ValueError as e:
         return f"Error: {str(e)}", 400
 
-    ## Updates the vocabulary based on 'processed' value
-    if language not in vocab_data or vocab_data[language]['processed'] == True:
-        vocab_data[language] = entry
-        vocab_data[language]['processed'] = False
+    ## Updates the unprocessed vocabulary
+    if language not in vocab_data or not vocab_data[language]['unprocessed']['vocabulary']:
+        vocab_data[language] = {'unprocessed': entry}
     else:
         localVocab = set()
-        localVocab.update(vocab_data[language]['vocabulary'])
+        localVocab.update(vocab_data[language]['unprocessed']['vocabulary'])
         localVocab.update(entry['vocabulary'])
-        vocab_data[language]['timestamp'] = entry['timestamp']
-        vocab_data[language]['vocabulary'] = list(localVocab)
+        vocab_data[language]['unprocessed']['timestamp'] = entry['timestamp']
+        vocab_data[language]['unprocessed']['vocabulary'] = list(localVocab)
 
     write_data_to_json("VOCAB_PATH", vocab_data)
     
@@ -56,13 +55,16 @@ def save_session() -> tuple:
 
     ## Accepts language data from server
     try:
-        language, entry = parse_request(['language', 'timestamp'],
+        language, entry = parse_request(['language', 'timestamp', 'active'],
                                         ['CurrentSection', 'CurrentUnit'])
     except ValueError as e:
         return f"Error: {str(e)}", 400
 
     ## Update new entry
     session_data[language] = entry
+
+    ## Marking other languages as inactive
+    set_active_session(session_data, language)
 
     # Write everything back to the JSON file
     write_data_to_json("SESSION_PATH", session_data)

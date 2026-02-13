@@ -1,11 +1,14 @@
 {
   "pt": {
-    "timestamp": "2026-02-12T16:08:32.359Z"
+    "timestamp": "2026-02-12T16:08:32.359Z",
+    "active": true
   },
   "de": {
-    "timestamp": "2026-02-10T21:20:52.791Z"
+    "timestamp": "2026-02-10T21:20:52.791Z",
+    "active": false
   },
   "gr": {
-    "timestamp": "2026-04-10T21:20:52.791Z"
+    "timestamp": "2026-04-10T21:20:52.791Z",
+    "active": false
   }
 }
