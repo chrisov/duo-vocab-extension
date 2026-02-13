@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from utils import safe_load_json, safe_write_json, parse_request
+from app.utils import load_data_from_json, write_data_to_json, parse_request
 
 
 app = Flask(__name__)
@@ -16,8 +16,8 @@ def save_vocab() -> tuple:
     :rtype: tuple
     """
 
-    ## Loads existing vocabulary
-    vocab_data = safe_load_json("VOCAB_PATH")
+    ## Loads existing session data or creates new
+    vocab_data = load_data_from_json("VOCAB_PATH")
 
     ## Accepts language data from server
     try:
@@ -36,7 +36,7 @@ def save_vocab() -> tuple:
         vocab_data[language]['timestamp'] = entry['timestamp']
         vocab_data[language]['vocabulary'] = list(localVocab)
 
-    safe_write_json("VOCAB_PATH", vocab_data)
+    write_data_to_json("VOCAB_PATH", vocab_data)
     
     return "Vocab sent succesfully", 200
 
@@ -51,10 +51,10 @@ def save_session() -> tuple:
     :rtype: tuple
     """
 
-    # Loads existing session data or creates new
-    session_data = safe_load_json("SESSION_PATH")
+    ## Loads existing session data or creates new
+    session_data = load_data_from_json("SESSION_PATH")
 
-    ## Get data from server
+    ## Accepts language data from server
     try:
         language, entry = parse_request(['language', 'timestamp'],
                                         ['CurrentSection', 'CurrentUnit'])
@@ -65,7 +65,7 @@ def save_session() -> tuple:
     session_data[language] = entry
 
     # Write everything back to the JSON file
-    safe_write_json("SESSION_PATH", session_data)
+    write_data_to_json("SESSION_PATH", session_data)
 
     return "Session sent successfully", 200
 

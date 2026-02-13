@@ -3,7 +3,9 @@ from pathlib import Path
 from flask import request
 
 
-CONFIG_DIR = Path("../config")
+# Resolve paths relative to the project root (one level above this file's directory)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+CONFIG_DIR = PROJECT_ROOT / "config"
 PATHS_FILE = CONFIG_DIR / "paths.json"
 
 
@@ -38,7 +40,7 @@ def safe_path_check(filepath: str) -> str:
 
 
 
-def safe_load_json(filepath: str) -> dict:
+def load_data_from_json(filepath: str) -> dict:
 	"""Loads JSON data for the given filepath using paths.json as a lookup.
 	
 	:param filepath: The JSON file to look for in the paths.json.
@@ -69,7 +71,7 @@ def safe_load_json(filepath: str) -> dict:
 
 
 
-def safe_write_json(filepath: str, data: dict):
+def write_data_to_json(filepath: str, data: dict):
 	"""
 	Writes data into a JSON file, using the paths.json as lookup.
 	
@@ -86,18 +88,7 @@ def safe_write_json(filepath: str, data: dict):
 	with open(data_path, "w", encoding='utf-8') as f:
 		json.dump(data, f, indent=2, ensure_ascii=False)
    
-
-
-
-def update_data(old: dict, new:dict):
-	
-	localVocab = {}
-	localVocab.update(old['vocabulary'])
-	localVocab.update(new['vocabulary'])
-	old['timestamp'] = new['timestamp']
-	old['vocabulary'] = localVocab
-
-
+   
 
 def parse_request(required: list[str], optional: list[str] | None = None) -> tuple:
 	"""
@@ -136,9 +127,9 @@ def parse_request(required: list[str], optional: list[str] | None = None) -> tup
 
 
 if __name__ == "__main__":
-	dict = safe_load_json("VOCAB_PATH")
+	dict = load_data_from_json("VOCAB_PATH")
 	print(f"VOCAB_PATH:\n{dict}'\n")
-	dict = safe_load_json("BACKEND_URL")
+	dict = load_data_from_json("BACKEND_URL")
 	print(f"BACKEND_URL:\n{dict}'\n")
-	dict = safe_load_json("SESSION_PATH")
+	dict = load_data_from_json("SESSION_PATH")
 	print(f"SESSION_PATH:\n{dict}'\n")

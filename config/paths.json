@@ -1,5 +1,6 @@
 {
 	"BACKEND_URL": "http://localhost:5000",
-	"VOCAB_PATH": "../.vocab/vocab.json",
-	"SESSION_PATH": "../config/session.json"
+	"VOCAB_PATH": ".vocab/vocab.json",
+	"VOCAB_COPY_PATH": ".vocab/vocabcopy.json",
+	"SESSION_PATH": "config/session.json"
 }
