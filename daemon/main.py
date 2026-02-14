@@ -22,6 +22,9 @@ if __name__ == "__main__":
 	data = load_data_from_json("VOCAB_COPY_PATH")
 	vocab = data[language]['unprocessed']['vocabulary']
 
+	print(vocab)
+	print(language)
+
 	## Call the LLM 
 	response = model_response(vocab, language)
 	print(response)

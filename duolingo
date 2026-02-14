@@ -6,8 +6,7 @@ cd "$SCRIPT_DIR"
 
 OPTIONS=(
   "Practice Duolingo"
-  #"Practice Vocabulary"
-  "Practice daemon"
+  "Practice daemon" #"Practice Vocabulary"
   "Exit"
 )
 

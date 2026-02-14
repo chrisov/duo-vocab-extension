@@ -26,7 +26,9 @@ def save_vocab() -> tuple:
         return f"Error: {str(e)}", 400
 
     ## Updates the unprocessed vocabulary
-    if language not in vocab_data or not vocab_data[language]['unprocessed']['vocabulary']:
+    if language not in vocab_data or not (
+        vocab_data.get(language, {}).get('unprocessed', {}).get('vocabulary', [])
+        ):
         vocab_data[language] = {'unprocessed': entry}
     else:
         localVocab = set()
