@@ -25,17 +25,17 @@ def save_vocab() -> tuple:
     except ValueError as e:
         return f"Error: {str(e)}", 400
 
-    ## Updates the unprocessed vocabulary
+    ## Updates the scraped vocabulary
     if language not in vocab_data or not (
-        vocab_data.get(language, {}).get('unprocessed', {}).get('vocabulary', [])
+        vocab_data.get(language, {}).get('scraped', {}).get('vocabulary', [])
         ):
-        vocab_data[language] = {'unprocessed': entry}
+        vocab_data[language] = {'scraped': entry}
     else:
         localVocab = set()
-        localVocab.update(vocab_data[language]['unprocessed']['vocabulary'])
+        localVocab.update(vocab_data[language]['scraped']['vocabulary'])
         localVocab.update(entry['vocabulary'])
-        vocab_data[language]['unprocessed']['timestamp'] = entry['timestamp']
-        vocab_data[language]['unprocessed']['vocabulary'] = list(localVocab)
+        vocab_data[language]['scraped']['timestamp'] = entry['timestamp']
+        vocab_data[language]['scraped']['vocabulary'] = list(localVocab)
 
     write_data_to_json("VOCAB_PATH", vocab_data)
     

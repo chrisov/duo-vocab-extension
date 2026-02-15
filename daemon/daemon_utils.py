@@ -18,24 +18,24 @@ def timing_function(func):
 
 
 
-def str_to_list(str:str) -> list[list]:
-	"""
-	Modifies the (str)vocabulary into a list
+# def str_to_list(str:str) -> list[list]:
+# 	"""
+# 	Modifies the (str)vocabulary into a list
 	
-	:param str: The input str.
-	:type str: str
-	:return: The vocabulary as list of a list.
-	:rtype: list[list]
-	"""
+# 	:param str: The input str.
+# 	:type str: str
+# 	:return: The vocabulary as list of a list.
+# 	:rtype: list[list]
+# 	"""
 
-	result = []
-	for line in str.splitlines():
-		line = line.strip()
-		if not line:
-			continue
-		cols = [c.strip() for c in line.split(',')]
-		result.append(cols)
-	return result
+# 	result = []
+# 	for line in str.splitlines():
+# 		line = line.strip()
+# 		if not line:
+# 			continue
+# 		cols = [c.strip() for c in line.split(',')]
+# 		result.append(cols)
+# 	return result
 
 
 
@@ -46,7 +46,7 @@ def get_active_session() -> str:
 	:return: Description
 	:rtype: str
 	"""
-	
+
 	session_data = load_data_from_json("SESSION_PATH")
 	for language, info in session_data.items():
 		if isinstance(info, dict) and info.get("active") is True:

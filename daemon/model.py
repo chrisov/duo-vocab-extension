@@ -7,21 +7,6 @@ from google.genai.errors import ClientError
 client, system_prompt = init()
 
 
-# def model_response(word_list: list, lang: str):
-#     try:
-#         response = client.models.generate_content(
-#             model="gemini-2.5-flash-lite",
-#             contents=f"Process these words in {lang} language: {', '.join(word_list)}",
-#             config=types.GenerateContentConfig(
-#                 system_instruction=system_prompt,
-#                 temperature=0.1
-#             )
-#         )
-#         return response.text
-#     except ClientError as e:
-#         if e.code == 429 or getattr(e, "code", None) == 429:
-#             return f"Quota exceeded, skipping for now: {str(e.status)}"
-
 # Define the structure of an 'approved' word
 word_schema = {
     "type": "OBJECT",
@@ -39,11 +24,12 @@ word_schema = {
     "required": ["Word", "Article", "English", "Plural", "Grammar", "Category", "Difficulty", "Count", "SuccessRate"]
 }
 
+
 # Define the overall response structure
 response_schema = {
     "type": "OBJECT",
     "properties": {
-        "processed": {
+        "staged": {
             "type": "OBJECT",
             "properties": {
                 "approved": {"type": "ARRAY", "items": word_schema},
@@ -52,8 +38,9 @@ response_schema = {
             "required": ["approved", "disapproved"]
         }
     },
-    "required": ["processed"]
+    "required": ["staged"]
 }
+
 
 def model_response(word_list: list, lang: str):
     try:

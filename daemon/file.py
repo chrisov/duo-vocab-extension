@@ -1,11 +1,12 @@
 from app.server_utils import load_data_from_json, write_data_to_json
+from datetime import datetime
 
 ## "pt": {
-## 	"unprocessed": {
+## 	"scraped": {
 ## 		"timestamp": str,
 ## 		"vocabulary": []
 ## 	},
-## 	"processed": {
+## 	"staged": {
 ## 		"timestamp": str,
 ## 		"approved": [{}],
 ## 		"disapproved": []
@@ -18,8 +19,9 @@ class JSONVocab:
 		self.__filepath = filepath
 		self.__data = load_data_from_json(filepath)
 		self.__language = language
-		self.__unprocessed = ((self.__data).get(language)).get('unprocessed')
-		self.__processed = ((self.__data).get(language)).get('processed')
+		self.__scraped = ((self.__data).get(language)).get('scraped')
+		self.__staged = ((self.__data).get(language)).get('staged')
+		self.__last_process_time = datetime.datetime.now()
 
 
 	def __del__(self):
