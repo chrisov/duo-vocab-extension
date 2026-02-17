@@ -9,7 +9,7 @@ CONFIG_DIR = PROJECT_ROOT / "config"
 PATHS_FILE = CONFIG_DIR / "paths.json"
 
 
-def safe_path_check(filepath: str) -> str:
+def _safe_path_check(filepath: str) -> str:
 	"""
 	Loads the paths.json safely, checks and returns the requested JSON filepath.
 		
@@ -50,8 +50,11 @@ def load_data_from_json(filepath: str) -> dict:
 	:rtype: dict
 	"""
 
-	## Loads the filepath
-	data_path = safe_path_check(filepath)
+	## Resolve the filepath
+	try:
+		data_path = _safe_path_check(filepath)
+	except KeyError:
+		data_path = (PROJECT_ROOT / filepath).resolve()
 
 	## Creates and init the requested file if not existing
 	if data_path.suffix == ".json":
@@ -81,8 +84,11 @@ def write_data_to_json(filepath: str, data: dict):
 	:type data: dict
 	"""
 
-	## Loads the filepath
-	data_path = safe_path_check(filepath)
+	## Resolve the filepath
+	try:
+		data_path = _safe_path_check(filepath)
+	except KeyError:
+		data_path = (PROJECT_ROOT / filepath).resolve()
 
 	## Writes to the file
 	with open(data_path, "w", encoding='utf-8') as f:

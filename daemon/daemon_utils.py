@@ -18,27 +18,6 @@ def timing_function(func):
 
 
 
-# def str_to_list(str:str) -> list[list]:
-# 	"""
-# 	Modifies the (str)vocabulary into a list
-	
-# 	:param str: The input str.
-# 	:type str: str
-# 	:return: The vocabulary as list of a list.
-# 	:rtype: list[list]
-# 	"""
-
-# 	result = []
-# 	for line in str.splitlines():
-# 		line = line.strip()
-# 		if not line:
-# 			continue
-# 		cols = [c.strip() for c in line.split(',')]
-# 		result.append(cols)
-# 	return result
-
-
-
 def get_active_session() -> str:
 	"""
 	Docstring for get_active_session

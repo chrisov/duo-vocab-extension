@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from app.server_utils import load_data_from_json, write_data_to_json, parse_request, set_active_session
@@ -5,25 +6,13 @@ from app.server_utils import load_data_from_json, write_data_to_json, parse_requ
 
 app = Flask(__name__)
 CORS(app)
+VOCAB_KEY = os.getenv("VOCAB_KEY")
 
 
-@app.route('/save-vocab', methods=['POST'])
-def save_vocab() -> tuple:
-    """
-    Saves extracted vocab to a JSON file.
-
-    :return: The response and its status code.
-    :rtype: tuple
-    """
-
+def _handle_save_vocab(language: str, entry: dict, vocab_key: str | None = None) -> tuple:
     ## Loads existing session data or creates new
-    vocab_data = load_data_from_json("VOCAB_PATH")
-
-    ## Accepts language data from server
-    try:
-        language, entry = parse_request(['language', 'timestamp', 'vocabulary'])
-    except ValueError as e:
-        return f"Error: {str(e)}", 400
+    key = vocab_key or VOCAB_KEY
+    vocab_data = load_data_from_json(key)
 
     ## Updates the scraped vocabulary
     if language not in vocab_data or not (
@@ -37,10 +26,28 @@ def save_vocab() -> tuple:
         vocab_data[language]['scraped']['timestamp'] = entry['timestamp']
         vocab_data[language]['scraped']['vocabulary'] = list(localVocab)
 
-    write_data_to_json("VOCAB_PATH", vocab_data)
-    
+    write_data_to_json(key, vocab_data)
+
     return "Vocab sent succesfully", 200
 
+
+
+@app.route('/save-vocab', methods=['POST'])
+def save_vocab() -> tuple:
+    """
+    Saves extracted vocab to a JSON file.
+
+    :return: The response and its status code.
+    :rtype: tuple
+    """
+
+    ## Accepts language data from server
+    try:
+        language, entry = parse_request(['language', 'timestamp', 'vocabulary'])
+    except ValueError as e:
+        return f"Error: {str(e)}", 400
+    
+    return _handle_save_vocab(language, entry)
 
 
 @app.route('/save-session', methods=['POST'])
