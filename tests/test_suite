@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+
+set -e
+cd /home/dimitris/Documents/42/github_repo/duo_ext
+source venv/bin/activate
+
+# Colors for output messages
+GREEN="\e[32m"
+RED="\e[31m"
+NC="\e[0m"  # reset color
+
+## Menu: choose what to run
+echo "Select test suite to run:"
+echo "  [1] Full suite"
+echo "  [2] Scraping"
+echo "  [3] Daemon"
+read -rp "Enter choice [1-3]: " CHOICE
+
+RUN_SCRAPING=false
+RUN_DAEMON=false
+
+case "$CHOICE" in
+  1|"" ) RUN_SCRAPING=true; RUN_DAEMON=true ;;
+  2 ) RUN_SCRAPING=true ;;
+  3 ) RUN_DAEMON=true ;;
+  * ) echo "Invalid choice"; exit 1 ;;
+esac
+
+i=0
+
+## Log file for failing scraping cases 
+LOG_FILE="tests/cases/test_scraping_failures.log"
+> "$LOG_FILE"
+
+if [ "$RUN_SCRAPING" = true ]; then
+  echo -e "\n================= SCRAPING ================="
+  for case_dir in tests/vocab/scraping/*/; do
+
+    TOTAL_CASES=$(printf '%s
+    ' tests/vocab/scraping/*/ | wc -l)
+
+    ## Each test file has the same name as its parent directory
+    case_name="$(basename "$case_dir")"
+    current_file="$case_dir$case_name.json"
+
+    ((++i))
+
+    if [[ ! -f "$current_file" ]]; then
+      echo "Skipping $case_dir (missing test file $case_name.json)"
+      continue
+    fi
+
+    echo -n "Test [$i/$TOTAL_CASES]: $(basename "$current_file"): "
+
+    ## Run the scraping case, which writes result.json next to the fixture
+    python -m tests.cases.scraping "$current_file"
+
+    result_file="$case_dir/result.json"
+    expected_file="$case_dir/expected.json"
+
+    ## Save diff result in a variable so it can be printed/logged
+    if [[ -f "$expected_file" && -f "$result_file" ]]; then
+
+      if [[ "$case_name" == "append_vocab" ]]; then
+        ## Special case: compare full 'pt' section via helper; use exit code
+        if python -m tests.compare_vocab "$expected_file" "$result_file"; then
+          diff_result=""
+        else
+          diff_result="pt section differs"
+        fi
+      else
+        diff_result="$(diff -u "$expected_file" "$result_file" || true)"
+      fi
+
+      if [[ -z "$diff_result" ]]; then
+        echo -e "${GREEN}PASS${NC} ✅"
+      else
+        echo -e "${RED}FAIL${NC} ❌"
+        ## Append failing case details to the log file
+        {
+          echo -e "==== FAIL: $(basename "$current_file") ===="
+          echo "$diff_result"
+          echo
+        } >> "$LOG_FILE"
+      fi
+    else
+      echo -e "${RED}FAIL${NC}"
+      echo -e "\tmissing expected or result file"
+    fi
+  done
+  echo "============================================"
+fi
+
+if [ "$RUN_DAEMON" = true ]; then
+  echo -e "\n================== DAEMON =================="
+  for case_dir in tests/vocab/daemon/*/; do
+
+
+        TOTAL_CASES=$(printf '%s
+    ' tests/vocab/scraping/*/ | wc -l)
+
+    ## Each test file has the same name as its parent directory
+    case_name="$(basename "$case_dir")"
+    current_file="$case_dir$case_name.json"
+
+    ((++i))
+
+    if [[ ! -f "$current_file" ]]; then
+      echo "Skipping $case_dir (missing test file $case_name.json)"
+      continue
+    fi
+
+    echo -n "Test [$i/$TOTAL_CASES]: $(basename "$current_file"): "
+
+    ## Run the scraping case, which writes result.json next to the fixture
+    python -m tests.cases.scraping "$current_file"
+
+    result_file="$case_dir/result.json"
+    expected_file="$case_dir/expected.json"
+
+    ## Save diff result in a variable so it can be printed/logged
+    if [[ -f "$expected_file" && -f "$result_file" ]]; then
+      diff_result="$(diff -u "$expected_file" "$result_file" || true)"
+
+      if [[ -z "$diff_result" ]]; then
+        echo -e "${GREEN}PASS${NC} ✅"
+      else
+        echo -e "${RED}FAIL${NC} ❌"
+        ## Append failing case details to the log file
+        {
+          echo -e "==== FAIL: $(basename "$current_file") ===="
+          echo "$diff_result"
+          echo
+        } >> "$LOG_FILE"
+      fi
+    else
+      echo -e "${RED}FAIL${NC}"
+      echo -e "\tmissing expected or result file"
+    fi
+  done
+  echo "=============================================="
+fi

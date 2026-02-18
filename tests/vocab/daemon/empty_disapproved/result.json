@@ -1,0 +1,16 @@
+{
+  "pt": {
+    "scraped": {
+      "timestamp": "2025-01-01T00:00:00Z",
+      "vocabulary": [
+        "gato",
+        "cidade"
+      ]
+    },
+    "staged": {
+      "timestamp": "2026-02-15T19:30:09.792517",
+      "approved": [],
+      "disapproved": []
+    }
+  }
+}

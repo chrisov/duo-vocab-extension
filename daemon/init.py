@@ -28,6 +28,7 @@ You are a professional Lexicographer. Your goal is to split a raw word list into
 	* Conjuctions (e.g. "because", "y")
 	* "Yes" and "no" (e.g. "Si", "Nein")
 	* Prepositions (e.g. "para", "de")
+	* International words (e.g. "cafe", "taxi", "hotel")
 </lexicographical_rules>
 
 <linguistic_transformation>

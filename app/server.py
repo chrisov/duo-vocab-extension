@@ -13,18 +13,23 @@ def _handle_save_vocab(language: str, entry: dict, vocab_key: str | None = None)
     ## Loads existing session data or creates new
     key = vocab_key or VOCAB_KEY
     vocab_data = load_data_from_json(key)
+    lang_data = vocab_data.get(language, {})
+
+    # if lang_data.get('scraped') is None:
+    #     print(lang_data)
 
     ## Updates the scraped vocabulary
-    if language not in vocab_data or not (
-        vocab_data.get(language, {}).get('scraped', {}).get('vocabulary', [])
-        ):
-        vocab_data[language] = {'scraped': entry}
+    if not lang_data.get('scraped', {}).get('vocabulary'):
+        lang_data['scraped'] = entry
+        vocab_data[language] = lang_data
     else:
+        lang_data['scraped']['timestamp'] = entry['timestamp']
         localVocab = set()
-        localVocab.update(vocab_data[language]['scraped']['vocabulary'])
+        localVocab.update(lang_data['scraped']['vocabulary'])
         localVocab.update(entry['vocabulary'])
-        vocab_data[language]['scraped']['timestamp'] = entry['timestamp']
-        vocab_data[language]['scraped']['vocabulary'] = list(localVocab)
+        lang_data['scraped']['vocabulary'] = list(localVocab)
+        vocab_data[language] = lang_data
+
 
     write_data_to_json(key, vocab_data)
 

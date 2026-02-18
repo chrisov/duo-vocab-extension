@@ -1,0 +1,136 @@
+{
+  "es": {
+    "scraped": {
+      "timestamp": "2026-02-15T19:49:28.732Z",
+      "vocabulary": []
+    },
+    "staged": {
+      "timestamp": "2026-01-01T00:00:00Z",
+      "approved": [
+        {
+          "Word": "casa",
+          "Article": "la",
+          "English": "house",
+          "Plural": "casas",
+          "Grammar": "Noun",
+          "Category": "Living",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "ventana",
+          "Article": "la",
+          "English": "window",
+          "Plural": "ventanas",
+          "Grammar": "Noun",
+          "Category": "Living",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "playa",
+          "Article": "la",
+          "English": "beach",
+          "Plural": "playas",
+          "Grammar": "Noun",
+          "Category": "Nature",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        }
+      ],
+      "disapproved": []
+    }
+  },
+  "fr": {
+    "scraped": {
+      "timestamp": "2026-02-15T19:49:28.732Z",
+      "vocabulary": []
+    },
+    "staged": {
+      "timestamp": "2026-01-01T00:00:00Z",
+      "approved": [
+        {
+          "Word": "livre",
+          "Article": "le",
+          "English": "book",
+          "Plural": "livres",
+          "Grammar": "Noun",
+          "Category": "Abstract",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "montagne",
+          "Article": "la",
+          "English": "mountain",
+          "Plural": "montagnes",
+          "Grammar": "Noun",
+          "Category": "Nature",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "fromage",
+          "Article": "le",
+          "English": "cheese",
+          "Plural": "fromages",
+          "Grammar": "Noun",
+          "Category": "Food",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        }
+      ],
+      "disapproved": []
+    }
+  },
+  "pt": {
+    "scraped": {
+      "timestamp": "2025-01-01T00:00:00Z"
+    },
+    "staged": {
+      "timestamp": "2026-01-01T00:00:00Z",
+      "approved": [
+        {
+          "Word": "cidade",
+          "Article": "a",
+          "English": "city",
+          "Plural": "cidades",
+          "Grammar": "Noun",
+          "Category": "Nature",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "cadeira",
+          "Article": "a",
+          "English": "chair",
+          "Plural": "cadeiras",
+          "Grammar": "Noun",
+          "Category": "Living",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "rio",
+          "Article": "o",
+          "English": "river",
+          "Plural": "rios",
+          "Grammar": "Noun",
+          "Category": "Nature",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        }
+      ],
+      "disapproved": []
+    }
+  }
+}
