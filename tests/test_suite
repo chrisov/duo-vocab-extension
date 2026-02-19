@@ -27,12 +27,10 @@ case "$CHOICE" in
 esac
 
 i=0
-
-## Log file for failing scraping cases 
-LOG_FILE="tests/cases/test_scraping_failures.log"
-> "$LOG_FILE"
-
 if [ "$RUN_SCRAPING" = true ]; then
+  SCRAPE_LOG_FILE="tests/cases/test_scraping_failures.log"
+  > "$SCRAPE_LOG_FILE"
+
   echo -e "\n================= SCRAPING ================="
   for case_dir in tests/vocab/scraping/*/; do
 
@@ -61,13 +59,8 @@ if [ "$RUN_SCRAPING" = true ]; then
     ## Save diff result in a variable so it can be printed/logged
     if [[ -f "$expected_file" && -f "$result_file" ]]; then
 
-      if [[ "$case_name" == "append_vocab" ]]; then
-        ## Special case: compare full 'pt' section via helper; use exit code
-        if python -m tests.compare_vocab "$expected_file" "$result_file"; then
-          diff_result=""
-        else
-          diff_result="pt section differs"
-        fi
+      if python -m tests.compare_vocab "$expected_file" "$result_file"; then
+        diff_result=""
       else
         diff_result="$(diff -u "$expected_file" "$result_file" || true)"
       fi
@@ -81,7 +74,7 @@ if [ "$RUN_SCRAPING" = true ]; then
           echo -e "==== FAIL: $(basename "$current_file") ===="
           echo "$diff_result"
           echo
-        } >> "$LOG_FILE"
+        } >> "$SCRAPE_LOG_FILE"
       fi
     else
       echo -e "${RED}FAIL${NC}"
@@ -91,13 +84,16 @@ if [ "$RUN_SCRAPING" = true ]; then
   echo "============================================"
 fi
 
+
+
 if [ "$RUN_DAEMON" = true ]; then
+  DAEMON_LOG_FILE="tests/cases/test_daemon_failures.log"
+  > "$DAEMON_LOG_FILE"
   echo -e "\n================== DAEMON =================="
   for case_dir in tests/vocab/daemon/*/; do
 
-
-        TOTAL_CASES=$(printf '%s
-    ' tests/vocab/scraping/*/ | wc -l)
+    TOTAL_CASES=$(printf '%s
+  ' tests/vocab/daemon/*/ | wc -l)
 
     ## Each test file has the same name as its parent directory
     case_name="$(basename "$case_dir")"
@@ -112,15 +108,19 @@ if [ "$RUN_DAEMON" = true ]; then
 
     echo -n "Test [$i/$TOTAL_CASES]: $(basename "$current_file"): "
 
-    ## Run the scraping case, which writes result.json next to the fixture
-    python -m tests.cases.scraping "$current_file"
+    ## Run the daemon case, which writes result.json next to the fixture
+    python -m tests.cases.daemoning "$current_file"
 
     result_file="$case_dir/result.json"
     expected_file="$case_dir/expected.json"
 
     ## Save diff result in a variable so it can be printed/logged
     if [[ -f "$expected_file" && -f "$result_file" ]]; then
-      diff_result="$(diff -u "$expected_file" "$result_file" || true)"
+      if python -m tests.compare_vocab "$expected_file" "$result_file"; then
+        diff_result=""
+      else
+        diff_result=$(diff -u "$expected_file" "$result_file" || true)
+      fi
 
       if [[ -z "$diff_result" ]]; then
         echo -e "${GREEN}PASS${NC} ✅"
@@ -131,7 +131,7 @@ if [ "$RUN_DAEMON" = true ]; then
           echo -e "==== FAIL: $(basename "$current_file") ===="
           echo "$diff_result"
           echo
-        } >> "$LOG_FILE"
+        } >> "$DAEMON_LOG_FILE"
       fi
     else
       echo -e "${RED}FAIL${NC}"

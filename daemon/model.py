@@ -7,7 +7,7 @@ from google.genai.errors import ClientError
 client, system_prompt = init()
 
 
-# Define the structure of an 'approved' word
+## Define the structure of an 'approved' word
 word_schema = {
     "type": "OBJECT",
     "properties": {
@@ -25,7 +25,7 @@ word_schema = {
 }
 
 
-# Define the overall response structure
+## Define the overall response structure
 response_schema = {
     "type": "OBJECT",
     "properties": {
@@ -41,6 +41,24 @@ response_schema = {
     "required": ["staged"]
 }
 
+## Response example for testing purposes
+response_example = """
+{
+    "staged": {
+    "timestamp": "2025-01-01T00:00:00Z",
+        "approved": [
+            {"Word": "falar", "Article": "", "English": "to speak", "Plural": "", "Grammar": "Verb", "Category": "Motion", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "ir", "Article": "", "English": "to go", "Plural": "", "Grammar": "Verb", "Category": "Motion", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "gato", "Article": "o", "English": "cat", "Plural": "gatos", "Grammar": "Noun", "Category": "Nature", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "bonito", "Article": "", "English": "pretty", "Plural": "", "Grammar": "Adjective", "Category": "Abstract", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "vermelho", "Article": "", "English": "red", "Plural": "", "Grammar": "Adjective", "Category": "Abstract", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "rapidamente", "Article": "", "English": "quickly", "Plural": "", "Grammar": "Adverb", "Category": "Motion", "Difficulty": "A2", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "sempre", "Article": "", "English": "always", "Plural": "", "Grammar": "Adverb", "Category": "Time", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0}
+        ],
+        "disapproved": ["eu", "bom dia", "até logo", "tudo bem?", "o", "a", "e"]
+    }
+}
+"""
 
 def model_response(word_list: list, lang: str):
     try:

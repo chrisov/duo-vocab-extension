@@ -15,9 +15,6 @@ def _handle_save_vocab(language: str, entry: dict, vocab_key: str | None = None)
     vocab_data = load_data_from_json(key)
     lang_data = vocab_data.get(language, {})
 
-    # if lang_data.get('scraped') is None:
-    #     print(lang_data)
-
     ## Updates the scraped vocabulary
     if not lang_data.get('scraped', {}).get('vocabulary'):
         lang_data['scraped'] = entry
@@ -29,7 +26,6 @@ def _handle_save_vocab(language: str, entry: dict, vocab_key: str | None = None)
         localVocab.update(entry['vocabulary'])
         lang_data['scraped']['vocabulary'] = list(localVocab)
         vocab_data[language] = lang_data
-
 
     write_data_to_json(key, vocab_data)
 
@@ -53,6 +49,7 @@ def save_vocab() -> tuple:
         return f"Error: {str(e)}", 400
     
     return _handle_save_vocab(language, entry)
+
 
 
 @app.route('/save-session', methods=['POST'])

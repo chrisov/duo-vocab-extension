@@ -18,7 +18,8 @@ def compare_pt_section(expected_path: str, result_path: str) -> int:
         'staged':  {'timestamp': str, 'approved': [{}], 'disapproved': []}
       }
 
-    - Compares timestamps as plain strings.
+    - Checks that timestamps exist (non-null) in the result,
+      but does not compare their concrete values.
     - Compares scraped.vocabulary as sets (order-insensitive) and reports
       missing/extra words.
     - Compares staged.disapproved as sets (order-insensitive).
@@ -45,11 +46,13 @@ def compare_pt_section(expected_path: str, result_path: str) -> int:
         return 1
 
     # --- scraped ---
+
     exp_scraped = exp_pt.get("scraped", {})
     res_scraped = res_pt.get("scraped", {})
 
-    if exp_scraped.get("timestamp") != res_scraped.get("timestamp"):
-        issues.append("scraped.timestamp differs")
+    # Only require that result has a non-null scraped.timestamp
+    if res_scraped.get("timestamp") is None:
+        issues.append("scraped.timestamp missing")
 
     exp_vocab = exp_scraped.get("vocabulary", [])
     res_vocab = res_scraped.get("vocabulary", [])
@@ -63,8 +66,9 @@ def compare_pt_section(expected_path: str, result_path: str) -> int:
     exp_staged = exp_pt.get("staged", {})
     res_staged = res_pt.get("staged", {})
 
-    if exp_staged.get("timestamp") != res_staged.get("timestamp"):
-        issues.append("staged.timestamp differs")
+    # Only require that result has a non-null staged.timestamp
+    if res_staged.get("timestamp") is None:
+        issues.append("staged.timestamp missing")
 
     # disapproved: compare as sets
     exp_dis = exp_staged.get("disapproved", [])

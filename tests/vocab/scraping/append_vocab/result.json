@@ -85,18 +85,18 @@
     "scraped": {
       "timestamp": "2025-01-01T00:00:00Z",
       "vocabulary": [
-        "gato",
-        "irmã",
-        "sério",
-        "falo",
+        "cidade",
         "pouco",
-        "Legal",
-        "mala",
-        "francês",
-        "simpático",
+        "sério",
         "português",
+        "falo",
+        "Legal",
+        "simpático",
+        "mala",
+        "gato",
         "passaporte",
-        "cidade"
+        "irmã",
+        "francês"
       ]
     },
     "staged": {

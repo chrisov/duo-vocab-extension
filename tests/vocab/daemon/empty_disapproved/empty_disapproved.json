@@ -1,12 +1,38 @@
 {
   "pt": {
     "scraped": {
-      "timestamp": null,
-      "vocabulary": []
+      "timestamp": "2026-02-15T19:49:28.732Z",
+      "vocabulary": [
+        "gato",
+        "cidade"
+      ]
     },
     "staged": {
       "timestamp": "2026-02-15T19:30:09.792517",
-      "approved": [],
+      "approved": [
+        {
+          "Word": "gato",
+          "Article": "o",
+          "English": "cat",
+          "Plural": "gatos",
+          "Grammar": "Noun",
+          "Category": "Nature",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "bonito",
+          "Article": "",
+          "English": "pretty",
+          "Plural": "",
+          "Grammar": "Adjective",
+          "Category": "Abstract",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        }
+      ],
       "disapproved": []
     }
   }

@@ -2,7 +2,10 @@
   "pt": {
     "scraped": {
       "timestamp": "2026-02-15T19:49:28.732Z",
-      "vocabulary": []
+      "vocabulary": [
+        "gato",
+        "cidade"
+      ]
     }
   }
 }

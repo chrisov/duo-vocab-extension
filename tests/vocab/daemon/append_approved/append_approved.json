@@ -1,152 +1,34 @@
 {
   "pt": {
     "scraped": {
-      "timestamp": null,
-      "vocabulary": []
+      "timestamp": "2026-02-15T19:49:28.732Z",
+      "vocabulary": [
+        "gato",
+        "cidade"
+      ]
     },
     "staged": {
-      "timestamp": "2026-02-15T19:30:09.792517",
+      "timestamp": "2025-01-01T00:00:00Z",
       "approved": [
         {
-          "Word": "estudar",
+          "Word": "gato",
           "Article": "o",
-          "English": "to study",
-          "Plural": "",
-          "Grammar": "Verb",
-          "Category": "Abstract",
+          "English": "cat",
+          "Plural": "gatos",
+          "Grammar": "Noun",
+          "Category": "Nature",
           "Difficulty": "A1",
           "Count": 0,
           "SuccessRate": 0.0
         },
         {
-          "Word": "francês",
-          "Article": "o",
-          "English": "French",
-          "Plural": "",
-          "Grammar": "Noun",
-          "Category": "Abstract",
-          "Difficulty": "A2",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "legal",
+          "Word": "bonito",
           "Article": "",
-          "English": "cool/legal",
+          "English": "pretty",
           "Plural": "",
           "Grammar": "Adjective",
           "Category": "Abstract",
-          "Difficulty": "A2",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "falar",
-          "Article": "",
-          "English": "to speak",
-          "Plural": "",
-          "Grammar": "Verb",
-          "Category": "Motion",
           "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "inglês",
-          "Article": "o",
-          "English": "English",
-          "Plural": "",
-          "Grammar": "Noun",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "pouco",
-          "Article": "",
-          "English": "little/few",
-          "Plural": "",
-          "Grammar": "Adverb",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "espanhol",
-          "Article": "o",
-          "English": "Spanish",
-          "Plural": "",
-          "Grammar": "Noun",
-          "Category": "Abstract",
-          "Difficulty": "A2",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "muito",
-          "Article": "",
-          "English": "very/much/many",
-          "Plural": "",
-          "Grammar": "Adverb",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "bem",
-          "Article": "",
-          "English": "well",
-          "Plural": "",
-          "Grammar": "Adverb",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "português",
-          "Article": "o",
-          "English": "Portuguese",
-          "Plural": "",
-          "Grammar": "Noun",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "também",
-          "Article": "",
-          "English": "also/too",
-          "Plural": "",
-          "Grammar": "Adverb",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "vestido",
-          "Article": "o",
-          "English": "dress",
-          "Plural": "",
-          "Grammar": "Noun",
-          "Category": "Abstract",
-          "Difficulty": "A2",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "banco",
-          "Article": "o",
-          "English": "bank/bench",
-          "Plural": "",
-          "Grammar": "Noun",
-          "Category": "Abstract",
-          "Difficulty": "A2",
           "Count": 0,
           "SuccessRate": 0.0
         }

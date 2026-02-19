@@ -1,9 +1,10 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 
-
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parents[1]
+load_dotenv(BASE_DIR / "config" / ".env")
 API_KEY=os.environ["API_KEY"]
 try:
 	client = genai.Client(api_key=API_KEY)

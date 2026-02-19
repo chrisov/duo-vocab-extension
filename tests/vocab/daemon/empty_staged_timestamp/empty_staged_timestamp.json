@@ -1,13 +1,22 @@
 {
   "pt": {
     "scraped": {
-      "timestamp": null,
-      "vocabulary": []
+      "timestamp": "2026-02-15T19:49:28.732Z",
+      "vocabulary": [
+        "gato",
+        "cidade"
+      ]
     },
     "staged": {
       "timestamp": null,
       "approved": [],
-      "disapproved": []
+      "disapproved": [
+        "eu",
+        "bom dia",
+        "o",
+        "a",
+        "e"
+      ]
     }
   }
 }

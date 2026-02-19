@@ -5,30 +5,8 @@
       "vocabulary": []
     },
     "staged": {
-      "timestamp": "2026-02-15T19:30:09.792517",
+      "timestamp": "2025-01-01T00:00:00Z",
       "approved": [
-        {
-          "Word": "gato",
-          "Article": "o",
-          "English": "cat",
-          "Plural": "gatos",
-          "Grammar": "Noun",
-          "Category": "Nature",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
-        {
-          "Word": "bonito",
-          "Article": "",
-          "English": "pretty",
-          "Plural": "",
-          "Grammar": "Adjective",
-          "Category": "Abstract",
-          "Difficulty": "A1",
-          "Count": 0,
-          "SuccessRate": 0.0
-        },
         {
           "Word": "falar",
           "Article": "",
@@ -47,6 +25,28 @@
           "Plural": "",
           "Grammar": "Verb",
           "Category": "Motion",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "gato",
+          "Article": "o",
+          "English": "cat",
+          "Plural": "gatos",
+          "Grammar": "Noun",
+          "Category": "Nature",
+          "Difficulty": "A1",
+          "Count": 0,
+          "SuccessRate": 0.0
+        },
+        {
+          "Word": "bonito",
+          "Article": "",
+          "English": "pretty",
+          "Plural": "",
+          "Grammar": "Adjective",
+          "Category": "Abstract",
           "Difficulty": "A1",
           "Count": 0,
           "SuccessRate": 0.0
@@ -86,15 +86,12 @@
         }
       ],
       "disapproved": [
-        "até logo",
-        "não",
-        "Júlia",
-        "Brasil",
-        "a",
         "eu",
         "bom dia",
+        "até logo",
         "tudo bem?",
         "o",
+        "a",
         "e"
       ]
     }
