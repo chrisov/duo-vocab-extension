@@ -50,10 +50,7 @@ def	_process_model_response(obj: JSONVocab, new_dict: dict):
 
 
 
-def handle_daemon(test_mode: bool = False):
-
-	## Load vocab for the currently active session
-	obj = JSONVocab("VOCAB_PATH", get_active_session())
+def handle_daemon(obj: JSONVocab, test_mode: bool = False):
 
 	## Call the LLM
 	if test_mode == False:
@@ -71,4 +68,6 @@ def handle_daemon(test_mode: bool = False):
 
 
 if __name__ == "__main__":
-	handle_daemon(test_mode=True)	
+	## Load vocab for the currently active session
+	obj = JSONVocab("VOCAB_PATH", get_active_session())
+	handle_daemon(obj, test_mode=True)

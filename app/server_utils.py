@@ -9,7 +9,7 @@ CONFIG_DIR = PROJECT_ROOT / "config"
 PATHS_FILE = CONFIG_DIR / "paths.json"
 
 
-def _safe_path_check(filepath: str) -> str:
+def get_path(filepath: str) -> str:
 	"""
 	Loads the paths.json safely, checks and returns the requested JSON filepath.
 		
@@ -52,7 +52,7 @@ def load_data_from_json(filepath: str) -> dict:
 
 	## Resolve the filepath
 	try:
-		data_path = _safe_path_check(filepath)
+		data_path = get_path(filepath)
 	except KeyError:
 		data_path = (PROJECT_ROOT / filepath).resolve()
 
@@ -86,7 +86,7 @@ def write_data_to_json(filepath: str, data: dict):
 
 	## Resolve the filepath
 	try:
-		data_path = _safe_path_check(filepath)
+		data_path = get_path(filepath)
 	except KeyError:
 		data_path = (PROJECT_ROOT / filepath).resolve()
 
