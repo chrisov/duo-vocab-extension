@@ -26,6 +26,9 @@ def	_process_model_response(obj: JSONVocab, new_dict: dict):
 	approved = obj.get_approved() or []
 	existing_words = {w.get('Word') for w in approved}
 
+	## Updates the timestamp
+	obj.set_staged_timestamp()
+
 	## Merges new unique 'approved' with the old property
 	for w in new_dict.get('approved', []):
 		key = w.get('Word')

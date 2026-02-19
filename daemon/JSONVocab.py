@@ -30,7 +30,7 @@ class JSONVocab:
 		# Initialize scraped/staged sections if missing
 		self.__scraped = lang_data.get('scraped')
 		if self.__scraped is None:
-			self.__scraped = {"timestamp": None, "vocabulary": []}
+			self.__scraped = {"timestamp": str(datetime.now()), "vocabulary": []}
 			lang_data['scraped'] = self.__scraped
 
 		self.__staged = lang_data.get('staged')
@@ -96,6 +96,9 @@ class JSONVocab:
 			self.init_staged()
 		self.__staged['disapproved'] = list(new_disappr)
 	
+
+	def set_staged_timestamp(self):
+		self.__staged['timestamp'] = str(datetime.now())
 
 	def write_data_to_json(self):
 		write_data_to_json(self.__filepath, self.__data)
