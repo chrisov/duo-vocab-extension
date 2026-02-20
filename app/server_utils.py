@@ -1,12 +1,15 @@
 import json
+import logging
 from pathlib import Path
 from flask import request
 
 
-# Resolve paths relative to the project root (one level above this file's directory)
+## Resolve paths relative to the project root (one level above this file's directory)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = PROJECT_ROOT / "config"
 PATHS_FILE = CONFIG_DIR / "paths.json"
+
+logger = logging.getLogger(__name__)
 
 
 def get_path(filepath: str) -> str:
@@ -23,19 +26,22 @@ def get_path(filepath: str) -> str:
 	## Creates the config dir if not existing
 	CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 	if not PATHS_FILE.exists():
+		logger.debug("'config' dir missing, created on the spot")
 		PATHS_FILE.write_text("{}", encoding="utf-8")
 
 	## Loads the paths.json
 	try:
 		paths = json.loads(PATHS_FILE.read_text(encoding="utf-8"))
 	except json.JSONDecodeError as e:
-		raise ValueError("paths.json is empty or contains invalid JSON") from e
+		logger.error(f"'paths.json': empty or invalid JSON: {str(e)}")
+		raise ValueError()
 
 	## Retrieves the filepath from the 
 	try:
 		data_path = Path(paths[filepath])
 	except KeyError as e:
-		raise KeyError(f"'{filepath}' does not exist in paths.json") from e
+		logger.error(f"'{filepath}': missing in 'paths.json': {str(e)}")
+		raise KeyError()
 	return data_path
 
 
@@ -60,7 +66,7 @@ def load_data_from_json(filepath: str) -> dict:
 	if data_path.suffix == ".json":
 		data_path.parent.mkdir(parents=True, exist_ok=True)
 		if not data_path.exists():
-			print(f"'{data_path}': Non existing file, created on the spot.")
+			logger.debug(f"'{data_path}': missing file, created on the spot")
 			data_path.write_text("{}", encoding="utf-8")
 
 	## Returns the contents of the requested file
@@ -68,7 +74,7 @@ def load_data_from_json(filepath: str) -> dict:
 		try:
 			return json.loads(data_path.read_text(encoding="utf-8"))
 		except json.JSONDecodeError:
-			print(f"'{data_path}': Invalid format, return an empty dict instead.")
+			logger.debug(f"'{data_path}': Invalid format, return an empty dict instead.")
 			data_path.write_text("{}", encoding="utf-8")
 	return {}
 
@@ -111,7 +117,8 @@ def parse_request(required: list[str], optional: list[str] | None = None) -> tup
 
 	data = request.get_json(silent=True)
 	if not data:
-		raise ValueError("Missing JSON body")
+		logger.error(f"'{data}': Invalid JSON")
+		raise ValueError()
 
 	language = data.get(required[0])
 	fields = {}
@@ -119,7 +126,8 @@ def parse_request(required: list[str], optional: list[str] | None = None) -> tup
 	## Parse required fields
 	for req in required[1:]:
 		if req not in data:
-			raise ValueError(f"Required key missing: {req}")
+			logger.debug(f"Required key missing: {req}")
+			raise ValueError()
 		fields[req] = data.get(req)
 
 	## Parse optional fields

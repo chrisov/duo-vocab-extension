@@ -1,9 +1,10 @@
-from daemon.daemon_utils import get_active_session 
+from daemon.daemon_utils import get_active_session
 from daemon.model import model_response, response_example
 from daemon.JSONVocab import JSONVocab
 from daemon.staging import staging
 from daemon.sql_utils import init_sql
 from daemon.logger import setup_loggin_config
+from app.server_utils import get_path
 import logging
 import json
 import time
@@ -12,6 +13,8 @@ import os
 setup_loggin_config("DAEMON")
 logger = logging.getLogger(__name__) 
 logger.info("Service started and ready")
+
+POLL_INTERVAL = 15.0
 
 def	_process_model_response(obj: JSONVocab, new_dict: dict):
 	"""
@@ -84,23 +87,38 @@ def process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
 def execute_daemon(filepath: str):
 	logger.info("Init SQL engine")
 	conn = init_sql()
-	# last_modific = os.path.getmtime(filepath)
 
-	# while True:
-	# 	current_modific = os.path.getmtime(filepath)
-	# 	if current_modific > last_modific:
+	abs_path = get_path(filepath)
+	try:
+		last_modific = os.path.getmtime(abs_path)
+	except FileNotFoundError:
+		logger.warning(f"'{abs_path}': File not found")
+		last_modific = 0
 
-	## Process the scraped vocabulary into the 'staged' property
-	obj = JSONVocab(filepath, get_active_session())
-	if obj.get_scraped_vocab() != []:
-		process_scraped_vocabulary(obj, test_mode=True)
-		obj.write_data_to_json()
-		logger.info("Processed 'scraped' vocabulary")
+	try:
+		while True:
+			try:
+				current_modific = os.path.getmtime(abs_path)
+			except FileNotFoundError:
+				logger.warning(f"'{abs_path}': File not found")
+				current_modific = 0
 
-		staging(conn, obj)
+			if current_modific > last_modific:
+				logger.info(f"'{abs_path}': Processing changes...")
+				last_modific = current_modific
 
-	logger.info("Disconnecting from DB...")
-	conn.close()
+				## Process the scraped vocabulary into the 'staged' property
+				obj = JSONVocab(filepath, get_active_session())
+				if obj.get_scraped_vocab() != []:
+					process_scraped_vocabulary(obj, test_mode=True)
+					obj.write_data_to_json()
+					logger.info("Processed 'scraped' vocabulary")
+
+					staging(conn, obj)
+			time.sleep(POLL_INTERVAL)
+	finally:
+		logger.info("Disconnecting from DB...")
+		conn.close()
 
 if __name__ == "__main__":
 	execute_daemon("VOCAB_PATH")

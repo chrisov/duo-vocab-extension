@@ -1,7 +1,10 @@
 from .init import init
 from google.genai import types
 from google.genai.errors import ClientError
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 ## Should it be called once beforethe call
 client, system_prompt = init()
@@ -77,8 +80,10 @@ def model_response(word_list: list, lang: str):
         return response.text
     except ClientError as e:
         if e.code == 429 or getattr(e, "code", None) == 429:
+            logger.error(f"Quota exceeded, skipping for now: {str(e.status)}")
             return f"Quota exceeded, skipping for now: {str(e.status)}"
         elif e.code == 503 or getattr(e, "code", None) == 503:
+            logger.error(f"High demand, try again later: {str(e.status)}")
             return f"High demand, try again later: {str(e.status)}"
 
 

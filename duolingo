@@ -6,7 +6,7 @@ cd "$SCRIPT_DIR"
 
 OPTIONS=(
   "Practice Duolingo"
-  "Practice daemon" #"Practice Vocabulary"
+  "Practice Vocabulary"
   "Exit"
 )
 
@@ -44,36 +44,43 @@ while true; do
         ;;
 	esac
 	elif [[ $key == "" ]]; then
-  # Enter pressed
-  case $current in
-    0)
-		# Start server in background as a module (so `from app.utils` works)
-		python3 -m app.server &
-		# python3 -m daemon.main &
-		server_pid=$!
+    # Enter pressed
+    case $current in
+      0)
+        # Start server in background as a module
+        python3 -u -m app.server 2>&1 | sed "s/^/[WEB] /" &
+        server_pid=$!
+        python3 -u -m daemon.main 2>&1 | sed "s/^/[DAEMON] /" &
+        daemon_pid=$!
 
-    	# Open Duolingo in a dedicated Firefox profile/instance
-		firefox -P duoteacher --no-remote "https://www.duolingo.com/learn" &
-			browser_pid=$!
+        echo -e "\n"
+        echo "Server started with PID $server_pid"
+        echo "Daemon started with PID $daemon_pid"
+        echo -e "\nINFO: You can inspect the process by running fg <pid> in a separate terminal session.\n"
 
-		# Wait until that Firefox instance exits
-		wait "$browser_pid"
+        # Open Duolingo in a dedicated Firefox profile/instance
+        firefox -P duoteacher --no-remote "https://www.duolingo.com/learn" &
+        browser_pid=$!
 
-		# Then stop the server and return to the menu
-		kill "$server_pid" 2>/dev/null || true
-		wait "$server_pid" 2>/dev/null || true
-      	;;
-    1)
-		python3 -m daemon.main
-      ;;
-    2)
-		deactivate
-		echo "Exiting"
-		break
-		;;
-  esac
+        # Wait until that Firefox instance exits
+        wait "$browser_pid"
+
+        # Then stop the server and return to the menu
+        kill "$server_pid" 2>/dev/null || true
+        wait "$server_pid" 2>/dev/null || true
+        ;;
+      1)
+        # python3 -m daemon.main
+        ;;
+      2)
+        deactivate
+        echo "Exiting"
+        break
+        ;;
+    esac
 
   # Optional pause before re-drawing menu (skip if you prefer immediate refresh)
+  echo -e "\n"
   read -rp "Press any key to continue..." -n1
 	fi
 done

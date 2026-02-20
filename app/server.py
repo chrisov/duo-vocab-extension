@@ -1,12 +1,28 @@
 import os
 from flask import Flask
 from flask_cors import CORS
-from app.server_utils import load_data_from_json, write_data_to_json, parse_request, set_active_session
+from app.logger import setup_loggin_config
+from app.server_utils import load_data_from_json, write_data_to_json, parse_request, set_active_session, get_path
+import logging
+from pathlib import Path
+from dotenv import load_dotenv
 
+
+## Setup 'Web' logger
+setup_loggin_config("WEB")
+logger = logging.getLogger(__name__) 
+logger.info("Service started and ready")
+
+CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
+if not load_dotenv(CONFIG_DIR / ".env"):
+    logger.warning(f"Could not load .env from '{CONFIG_DIR}'")
+VOCAB_KEY = os.getenv("VOCAB_KEY")
+if not VOCAB_KEY:
+    logger.error(f"{VOCAB_KEY}: Missing from .env file")
+    VOCAB_KEY = "VOCAB_PATH"
 
 app = Flask(__name__)
 CORS(app)
-VOCAB_KEY = os.getenv("VOCAB_KEY")
 
 
 def _handle_save_vocab(language: str, entry: dict, vocab_key: str | None = None) -> tuple:
@@ -29,6 +45,8 @@ def _handle_save_vocab(language: str, entry: dict, vocab_key: str | None = None)
 
     write_data_to_json(key, vocab_data)
 
+    logger.info("Vocabulary extracted successfully")
+
     return "Vocab sent succesfully", 200
 
 
@@ -42,10 +60,13 @@ def save_vocab() -> tuple:
     :rtype: tuple
     """
 
+    logger.info("Extracting vocabulary...")
+
     ## Accepts language data from server
     try:
         language, entry = parse_request(['language', 'timestamp', 'vocabulary'])
     except ValueError as e:
+        logger.error(f"Error extracting vocabulary: {str(e)}")
         return f"Error: {str(e)}", 400
     
     return _handle_save_vocab(language, entry)
@@ -61,6 +82,8 @@ def save_session() -> tuple:
     :rtype: tuple
     """
 
+    logger.info("Updating session info...")
+
     ## Loads existing session data or creates new
     session_data = load_data_from_json("SESSION_PATH")
 
@@ -69,6 +92,7 @@ def save_session() -> tuple:
         language, entry = parse_request(['language', 'timestamp', 'active'],
                                         ['CurrentSection', 'CurrentUnit'])
     except ValueError as e:
+        logger.error(f"Error updating session info: {str(e)}")
         return f"Error: {str(e)}", 400
 
     ## Update new entry
@@ -79,6 +103,8 @@ def save_session() -> tuple:
 
     # Write everything back to the JSON file
     write_data_to_json("SESSION_PATH", session_data)
+
+    logger.info(f"'{get_path("SESSION_PATH")}': Session info updated successfully")
 
     return "Session sent successfully", 200
 

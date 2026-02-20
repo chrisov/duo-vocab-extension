@@ -4,7 +4,7 @@ import sys
 # Simple ANSI color codes
 RESET = "\033[0m"
 COLORS = {
-    "SERVICE": "\033[36m",  # cyan # "\033[35m",	# magenta
+    "SERVICE": "\033[35m",	# magenta
     "DEBUG":   "\033[90m",  # grey
     "INFO":    "\033[32m",  # green
     "WARNING": "\033[33m",  # yellow
