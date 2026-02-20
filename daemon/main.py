@@ -75,7 +75,7 @@ def process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
 
 	## Check response's structural validity
 	if not response or not response.strip().startswith('{'):
-		print('Non-JSON model response, skipping...')
+		logger.warning("LLM: Invalid response, skipping")
 		return
 
 	## Process and persist the new staged vocabulary
@@ -108,13 +108,15 @@ def execute_daemon(filepath: str):
 				last_modific = current_modific
 
 				## Process the scraped vocabulary into the 'staged' property
-				obj = JSONVocab(filepath, get_active_session())
-				if obj.get_scraped_vocab() != []:
-					process_scraped_vocabulary(obj, test_mode=True)
-					obj.write_data_to_json()
-					logger.info("Processed 'scraped' vocabulary")
-
-					staging(conn, obj)
+				try:
+					obj = JSONVocab(filepath, get_active_session())
+					if obj.get_scraped_vocab() != []:
+						process_scraped_vocabulary(obj)
+						obj.write_data_to_json()
+						logger.info("Processed 'scraped' vocabulary")
+						staging(conn, obj)
+				except Exception as e:
+					logger.error(f"Daemon processing: {str(e)}")
 			time.sleep(POLL_INTERVAL)
 	finally:
 		logger.info("Disconnecting from DB...")

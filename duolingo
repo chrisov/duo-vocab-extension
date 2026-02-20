@@ -47,10 +47,11 @@ while true; do
     # Enter pressed
     case $current in
       0)
+
         # Start server in background as a module
-        python3 -u -m app.server 2>&1 | sed "s/^/[WEB] /" &
+        python3 -u -m app.server 2>&1 &
         server_pid=$!
-        python3 -u -m daemon.main 2>&1 | sed "s/^/[DAEMON] /" &
+        python3 -u -m daemon.main 2>&1 &
         daemon_pid=$!
 
         echo -e "\n"
@@ -59,16 +60,17 @@ while true; do
         echo -e "\nINFO: You can inspect the process by running fg <pid> in a separate terminal session.\n"
 
         # Open Duolingo in a dedicated Firefox profile/instance
-        firefox -P duoteacher --no-remote "https://www.duolingo.com/learn" &
+        firefox -P duoteacher --no-remote "https://www.duolingo.com/learn" 2>/dev/null
         browser_pid=$!
 
         # Wait until that Firefox instance exits
-        wait "$browser_pid"
+        # wait "$browser_pid"
 
         # Then stop the server and return to the menu
-        kill "$server_pid" 2>/dev/null || true
-        wait "$server_pid" 2>/dev/null || true
+        # kill "$server_pid" 2>/dev/null || true
+        # wait "$server_pid" 2>/dev/null || true
         ;;
+
       1)
         # python3 -m daemon.main
         ;;
@@ -79,8 +81,23 @@ while true; do
         ;;
     esac
 
-  # Optional pause before re-drawing menu (skip if you prefer immediate refresh)
-  echo -e "\n"
-  read -rp "Press any key to continue..." -n1
+    if [[ $current -eq 0 ]]; then
+      echo -e "\n"
+      read -rp "Browser tab closed, press any key to exit..." -n1
+      echo
+
+      if [[ -n "${server_pid:-}" ]]; then
+        kill "$server_pid" 2>/dev/null || true
+        wait "$server_pid" 2>/dev/null || true
+      fi
+
+      if [[ -n "${daemon_pid:-}" ]]; then
+        kill "$daemon_pid" 2>/dev/null || true
+        wait "$daemon_pid" 2>/dev/null || true
+      fi
+
+      deactivate
+      break
+    fi
 	fi
 done

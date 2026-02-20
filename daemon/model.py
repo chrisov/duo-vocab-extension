@@ -1,6 +1,6 @@
 from .init import init
 from google.genai import types
-from google.genai.errors import ClientError
+from google.genai.errors import ClientError, ServerError
 import logging
 
 
@@ -78,12 +78,12 @@ def model_response(word_list: list, lang: str):
             )
         )
         return response.text
-    except ClientError as e:
-        if e.code == 429 or getattr(e, "code", None) == 429:
+    except (ClientError, ServerError) as e:
+        if getattr(e, "code", None) in (429, ):
             logger.error(f"Quota exceeded, skipping for now: {str(e.status)}")
-            return f"Quota exceeded, skipping for now: {str(e.status)}"
-        elif e.code == 503 or getattr(e, "code", None) == 503:
+            return None
+        elif getattr(e, "code", None) in (503, ):
             logger.error(f"High demand, try again later: {str(e.status)}")
-            return f"High demand, try again later: {str(e.status)}"
+            return None
 
 
