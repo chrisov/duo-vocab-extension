@@ -1,7 +1,11 @@
-import sqlite3 as sql
 from app.server_utils import get_path
-import os
+import sqlite3 as sql
 import tabulate as tbl
+import os
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def print_tables(cursor: sql.Cursor):
@@ -18,15 +22,15 @@ def print_tables(cursor: sql.Cursor):
 def init_sql() -> sql.Connection:
 	db = get_path("DB")
 
-	print("Checking DB: ", end='')
+	logger.info("Checking DB")
 	existed = True if os.path.exists(db) else False
 	conn = sql.connect(db)
 	cursor = conn.cursor()
 
 	if existed:
-		print(f"Connecting to '{db}'...")
+		logger.info(f"Connecting to '{db}'...")
 	else:
-		print(f"Creating '{db}'...\nInitializing tables...")
+		logger.info(f"Creating '{db}': Initializing tables...")
 		## Init description table
 		cursor.execute('''
 				CREATE TABLE table_descriptions (
@@ -83,9 +87,11 @@ def init_sql() -> sql.Connection:
 					PRIMARY KEY (Word, English),
 					FOREIGN KEY (Word) REFERENCES vocabulary(Word) ON DELETE CASCADE);
 				''')
-		conn.commit()
-	print_tables(cursor)
-	print(f"'{db}': Connection established")
+	cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+	tables = cursor.fetchall()
+	conn.commit()
+	logger.info(f"Tables: {[t[0] for t in tables]}")
+	logger.info(f"'{db}': Connection established")
 	return conn
 
 
@@ -115,7 +121,7 @@ def populate_table(conn: sql.Connection, table_name: str, lang: str, vocab: list
 				),
 			)
 		except sql.Error as e:
-			print(f"An Error occurred: {e}")
+			logger.error(f"Error populating table '{table_name}': {str(e)}")
 	conn.commit()
 
 

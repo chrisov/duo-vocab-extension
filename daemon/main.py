@@ -1,8 +1,17 @@
-from daemon.daemon_utils import get_active_session
+from daemon.daemon_utils import get_active_session 
 from daemon.model import model_response, response_example
 from daemon.JSONVocab import JSONVocab
+from daemon.staging import staging
+from daemon.sql_utils import init_sql
+from daemon.logger import setup_loggin_config
+import logging
 import json
+import time
+import os
 
+setup_loggin_config("DAEMON")
+logger = logging.getLogger(__name__) 
+logger.info("Service started and ready")
 
 def	_process_model_response(obj: JSONVocab, new_dict: dict):
 	"""
@@ -48,9 +57,12 @@ def	_process_model_response(obj: JSONVocab, new_dict: dict):
 			existing_disapproved.add(item)
 	obj.set_disapproved(disapproved)
 
+	## Clears the 'scraped' vocabulary
+	obj.set_scraped_vocab([])
 
 
-def handle_daemon(obj: JSONVocab, test_mode: bool = False):
+
+def process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
 
 	## Call the LLM
 	if test_mode == False:
@@ -66,10 +78,29 @@ def handle_daemon(obj: JSONVocab, test_mode: bool = False):
 	## Process and persist the new staged vocabulary
 	new_staged = json.loads(response).get('staged', {})
 	_process_model_response(obj, new_staged)
-	obj.write_data_to_json()
 
+
+
+def execute_daemon(filepath: str):
+	logger.info("Init SQL engine")
+	conn = init_sql()
+	# last_modific = os.path.getmtime(filepath)
+
+	# while True:
+	# 	current_modific = os.path.getmtime(filepath)
+	# 	if current_modific > last_modific:
+
+	## Process the scraped vocabulary into the 'staged' property
+	obj = JSONVocab(filepath, get_active_session())
+	if obj.get_scraped_vocab() != []:
+		process_scraped_vocabulary(obj, test_mode=True)
+		obj.write_data_to_json()
+		logger.info("Processed 'scraped' vocabulary")
+
+		staging(conn, obj)
+
+	logger.info("Disconnecting from DB...")
+	conn.close()
 
 if __name__ == "__main__":
-	## Load vocab for the currently active session
-	obj = JSONVocab("VOCAB_PATH", get_active_session())
-	handle_daemon(obj, test_mode=True)
+	execute_daemon("VOCAB_PATH")
