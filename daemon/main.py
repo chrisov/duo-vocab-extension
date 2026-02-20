@@ -57,6 +57,8 @@ def handle_daemon(obj: JSONVocab, test_mode: bool = False):
 		response = model_response(obj.get_scraped_vocab(), obj.get_language())
 	else:
 		response = response_example
+
+	## Check response's structural validity
 	if not response or not response.strip().startswith('{'):
 		print('Non-JSON model response, skipping...')
 		return

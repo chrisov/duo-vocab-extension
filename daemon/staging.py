@@ -1,43 +1,16 @@
 import sqlite3 as sql
 from .JSONVocab import JSONVocab
-from app.server_utils import get_path
-from .daemon_utils import get_active_session
-import os
+from .daemon_utils import get_active_session, clear_list_from_json
+from .sql_utils import init_sql, populate_table, print_table
 
-def _init_sql():
-	db = get_path("DB")
-	conn = sql.connect(db)
-	cursor = conn.cursor()
-	cursor.execute('''
-			CREATE TABLE IF NOT EXISTS staging_approved (
-			Word TEXT PRIMARY KEY,
-			Language TEXT NOT NULL,
-			Article TEXT,
-			English TEXT NOT NULL,
-			Plural TEXT,
-			Grammar TEXT NOT NULL,
-			Category TEXT NOT NULL,
-			Difficulty TEXT NOT NULL,
-			Count INTEGER NOT NULL DEFAULT 0,
-			SuccessRate REAL NOT NULL DEFAULT 0.0
-			);
-			''')
-	conn.commit()
-	return cursor
-
-
-
-def staging(obj: JSONVocab):
+def staging(conn:sql.Connection, obj: JSONVocab):
 	approved = obj.get_approved()
-	disapproved = obj.get_disapproved()
-
-	print(approved)
-	print(disapproved)
-
-
+	populate_table(conn, 'staging', obj.get_language(), approved)
 
 if __name__ == "__main__":
 
-	cursor = _init_sql()
+	conn = init_sql()
 	obj = JSONVocab("VOCAB_PATH", get_active_session())
-	staging(obj)
+	staging(conn, obj)
+	print_table(conn, 'staging')
+	conn.close()
