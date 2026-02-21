@@ -1,10 +1,11 @@
-from daemon.daemon_utils import get_active_session
+from daemon.daemon_utils import get_active_session, process_flags
 from daemon.model import model_response, response_example
 from daemon.JSONVocab import JSONVocab
 from daemon.staging import staging
 from daemon.sql_utils import init_sql
 from daemon.logger import setup_loggin_config
 from app.server_utils import get_path
+import argparse
 import logging
 import json
 import time
@@ -84,7 +85,7 @@ def process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
 
 
 
-def execute_daemon(filepath: str):
+def execute_daemon(filepath: str, args: argparse.Namespace):
 	logger.info("Init SQL engine")
 	conn = init_sql()
 
@@ -104,16 +105,16 @@ def execute_daemon(filepath: str):
 				current_modific = 0
 
 			if current_modific > last_modific:
-				logger.info(f"'{abs_path}': Processing changes...")
 				last_modific = current_modific
 
 				## Process the scraped vocabulary into the 'staged' property
 				try:
 					obj = JSONVocab(filepath, get_active_session())
 					if obj.get_scraped_vocab() != []:
-						process_scraped_vocabulary(obj)
+						logger.info(f"'{abs_path}': Processing changes...")
+						process_scraped_vocabulary(obj, args.test_mode)
 						obj.write_data_to_json()
-						logger.info("Processed 'scraped' vocabulary")
+						logger.info("'scraped' vocabulary processed successfully")
 						staging(conn, obj)
 				except Exception as e:
 					logger.error(f"Daemon processing: {str(e)}")
@@ -123,4 +124,5 @@ def execute_daemon(filepath: str):
 		conn.close()
 
 if __name__ == "__main__":
-	execute_daemon("VOCAB_PATH")
+	args = process_flags()
+	execute_daemon("VOCAB_PATH", args)

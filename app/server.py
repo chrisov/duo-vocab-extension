@@ -1,4 +1,6 @@
 import os
+import socket
+import sys
 from flask import Flask
 from flask_cors import CORS
 from app.logger import setup_loggin_config
@@ -10,7 +12,10 @@ from dotenv import load_dotenv
 
 ## Setup 'Web' logger
 setup_loggin_config("WEB")
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
+
+# Silence Flask/Werkzeug default HTTP access logging
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
 logger.info("Service started and ready")
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
@@ -111,4 +116,14 @@ def save_session() -> tuple:
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    PORT = 5000
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            s.bind(("127.0.0.1", PORT))
+        except OSError:
+            logger.error(f"Port {PORT} is already in use. Exiting.")
+            sys.exit(1)
+
+    app.run(port=PORT)

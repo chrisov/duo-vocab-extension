@@ -7,6 +7,7 @@ cd "$SCRIPT_DIR"
 OPTIONS=(
   "Practice Duolingo"
   "Practice Vocabulary"
+  "Installation"
   "Exit"
 )
 
@@ -44,14 +45,22 @@ while true; do
         ;;
 	esac
 	elif [[ $key == "" ]]; then
-    # Enter pressed
     case $current in
       0)
 
         # Start server in background as a module
         python3 -u -m app.server 2>&1 &
         server_pid=$!
-        python3 -u -m daemon.main 2>&1 &
+
+        # Give the server a moment to fail fast (e.g. port already in use)
+        sleep 1
+        if ! kill -0 "$server_pid" 2>/dev/null; then
+          echo -e "\nServer failed to start. Exiting."
+          deactivate
+          exit 1
+        fi
+
+        python3 -u -m daemon.main 2>&1 --test_mode &
         daemon_pid=$!
 
         echo -e "\n"
@@ -61,20 +70,16 @@ while true; do
 
         # Open Duolingo in a dedicated Firefox profile/instance
         firefox -P duoteacher --no-remote "https://www.duolingo.com/learn" 2>/dev/null
-        browser_pid=$!
 
-        # Wait until that Firefox instance exits
-        # wait "$browser_pid"
-
-        # Then stop the server and return to the menu
-        # kill "$server_pid" 2>/dev/null || true
-        # wait "$server_pid" 2>/dev/null || true
         ;;
 
       1)
         # python3 -m daemon.main
         ;;
       2)
+        # Installation
+        ;;
+      3)
         deactivate
         echo "Exiting"
         break

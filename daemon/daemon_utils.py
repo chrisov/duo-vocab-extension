@@ -1,22 +1,5 @@
-import time
 from app.server_utils import load_data_from_json, write_data_to_json
-
-
-def timing_function(func):
-	"""
-	Timer decorator function
-	
-	:param func: Function to be decorated
-	"""
-
-	def wrapper():
-		start = time.perf_counter
-		func()
-		end = time.perf_counter
-		print(f"'{func}' execution time: {'{:.2e}'.format(end - start)}")
-	return wrapper
-
-
+import argparse
 
 def get_active_session() -> str:
 	"""
@@ -49,3 +32,10 @@ def clear_list_from_json(filepath: str, lang: str, list_name: str):
 
 	print(data)
 	write_data_to_json(filepath, data)
+
+
+
+def process_flags():
+	parser = argparse.ArgumentParser(description="Duo Teacher Service")
+	parser.add_argument("-t", "--test_mode", action="store_true")
+	return parser.parse_args()
