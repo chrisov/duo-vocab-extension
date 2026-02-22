@@ -37,6 +37,7 @@ You are a professional Lexicographer. Your goal is to split a raw word list into
     * Verbs -> Infinitive (e.g., "hablamos" to "hablar").
     * Nouns -> Nominative Singular.
     * Adjectives -> Masculine Singular.
+	* Article -> Definite Article (e.g. "der", "le", "o")
 - Field Constraints:
     * Grammar: MUST be exactly one of ["Noun", "Verb", "Adjective", "Adverb", "Pronoun", "Phrase"].
     * Article: Only for Nouns.

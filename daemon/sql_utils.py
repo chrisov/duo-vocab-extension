@@ -77,15 +77,20 @@ def init_sql() -> sql.Connection:
 					Category TEXT NOT NULL,
 					Difficulty TEXT NOT NULL,
 					Count INTEGER NOT NULL DEFAULT 0,
-					SuccessRate REAL NOT NULL DEFAULT 0.0);
+					SuccessRate REAL NOT NULL DEFAULT 0.0,
+				 	PRIMARY KEY (Word, Language));
 				''')
 
+		## Init translation table
 		cursor.execute('''
 				CREATE TABLE IF NOT EXISTS translation (
 					Word     TEXT    NOT NULL,
+				 	Language TEXT NOT NULL,
 					English  TEXT    NOT NULL,
-					PRIMARY KEY (Word, English),
-					FOREIGN KEY (Word) REFERENCES vocabulary(Word) ON DELETE CASCADE);
+					PRIMARY KEY (Word, Language, English),
+					FOREIGN KEY (Word, Language)
+				 		REFERENCES vocabulary (Word, Language)
+				 		ON DELETE CASCADE);
 				''')
 	cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 	tables = cursor.fetchall()
@@ -131,5 +136,39 @@ def print_table(conn: sql.Connection, table_name: str):
 	cursor.execute(f"SELECT * FROM {table_name}")
 	rows = cursor.fetchall()
 	columns = [description[0] for description in cursor.description]
+
 	print("\n" + tbl.tabulate(rows, headers=columns, tablefmt='fancy_grid'))
 	print(f"Table name: '{table_name}'")
+
+
+
+def copy__to_staging(conn: sql.Connection, word: str, lang: str):
+	cursor = conn.cursor()
+
+	cursor.execute("""
+		INSERT OR IGNORE INTO vocabulary (
+			Word,
+			Article,
+			Language,
+			Plural,
+			Grammar,
+			Category,
+			Difficulty,
+			Count,
+			SuccessRate
+		)
+		SELECT
+			Word,
+			Article,
+			Language,
+			Plural,
+			Grammar,
+			Category,
+			Difficulty,
+			Count,
+			SuccessRate
+		FROM staging
+		WHERE Word = ? AND Language = ?
+	""", (word, lang, ))
+
+
