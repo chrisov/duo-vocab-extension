@@ -1,7 +1,7 @@
 from .validation import validate_all_approved, validate_all_disapproved, validate
 from sqlite3 import Connection, Error
 import logging
-from daemon.sql_utils import print_table
+from examiner.sql_utils import print_table
 
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def process_staging(conn: Connection):
 
 	logger.info("There are changes that require validation")
 	while True:
-		valid_input = input("\nProceed with data validation? (y/n) ")
+		valid_input = input("\nProceed? (y/n) ")
 		if valid_input == 'n':
 			return
 		elif valid_input == 'y':

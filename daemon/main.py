@@ -1,8 +1,8 @@
 from daemon.daemon_utils import get_active_session, process_flags
 from daemon.model import model_response, response_example
 from daemon.JSONVocab import JSONVocab
-from daemon.staging import staging
-from daemon.sql_utils import init_sql
+# from daemon.staging import staging
+# from daemon.sql_utils import init_sql
 from daemon.logger import setup_loggin_config
 from app.server_utils import get_path
 import argparse
@@ -66,7 +66,7 @@ def	_process_model_response(obj: JSONVocab, new_dict: dict):
 
 
 
-def process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
+def _process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
 
 	## Call the LLM
 	if test_mode == False:
@@ -112,10 +112,10 @@ def execute_daemon(filepath: str, args: argparse.Namespace):
 					obj = JSONVocab(filepath, get_active_session())
 					if obj.get_scraped_vocab() != []:
 						logger.info(f"'{abs_path}': Processing changes...")
-						process_scraped_vocabulary(obj, args.test_mode)
+						_process_scraped_vocabulary(obj, args.test_mode)
 						obj.write_data_to_json()
 						logger.info("'scraped' vocabulary processed successfully")
-						staging(conn, obj)
+						# staging(conn, obj)
 				except Exception as e:
 					logger.error(f"Daemon processing: {str(e)}")
 			time.sleep(POLL_INTERVAL)

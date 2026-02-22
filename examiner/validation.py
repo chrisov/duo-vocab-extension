@@ -1,6 +1,6 @@
 from sqlite3 import Connection
 import logging
-from daemon.sql_utils import copy__to_staging
+from examiner.sql_utils import populate_vocabulary, populate_translation
 from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
@@ -48,15 +48,13 @@ def validate(conn: Connection):
 	## Load table
 	cursor.execute("SELECT * FROM staging;")
 	rows = cursor.fetchall()
+	columns = [description[0] for description in cursor.description]
 	
 	## Count the rows
-	cursor.execute("SELECT COUNT(*) FROM translation")
+	cursor.execute("SELECT COUNT (*) FROM staging")
 	count = cursor.fetchone()[0]
-	
-	## Load the headers
-	columns = [description[0] for description in cursor.description]
 
-	for i, row in enumerate(rows):
+	for i, row in enumerate(rows, 1):
 
 		print("\n" + tabulate([row], headers=columns, tablefmt="fancy_grid"))
 
@@ -64,12 +62,13 @@ def validate(conn: Connection):
 		while True:
 			match user_input:
 				case 'a':
-					copy__to_staging(conn, row[0], row[2])
-					cursor.execute("DELETE FROM staging WHERE Word = ? AND Language = ?", (row[0], rows[2], ))
+					populate_vocabulary(conn, row[0], row[2])
+					populate_translation(conn, row[0], row[2])
+					cursor.execute("DELETE FROM staging WHERE Word = ? AND Language = ?", (row[0], row[2], ))
 					logger.info(f"Approved: '{row[0]}' ✅")
 					break;
 				case 'd':
-					cursor.execute("DELETE FROM staging WHERE Word = ? AND Language = ?", (row[0], row[2]))
+					cursor.execute("DELETE FROM staging WHERE Word = ? AND Language = ?", (row[0], row[2], ))
 					logger.info(f"Deleted: '{row[0]}' 🗑️")
 					break;
 				case 'e':
