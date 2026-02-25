@@ -1,0 +1,25 @@
+Container {
+	margin: 1 2;
+	padding: 1;
+	border: solid $primary;
+}
+Grid {
+	grid-columns: 1fr 1fr 1fr;
+	grid-rows: auto;
+	grid-row-gap: 1;
+	grid-column-gap: 2;
+	padding: 1;
+}
+Label { 
+	padding: 1;
+}
+.actions {
+	column-span: 3;
+	height: 3;
+	align: center middle;
+}
+
+Container {
+	min-width: 20;
+	min-height: 3;
+}
