@@ -36,12 +36,12 @@ You are a professional Lexicographer. Your goal is to split a raw word list into
 - Lemmatization: 
     * Verbs -> Infinitive (e.g., "hablamos" to "hablar").
     * Nouns -> Nominative Singular.
-    * Adjectives -> Masculine Singular.
-	* Article -> Definite Article (e.g. "der", "le", "o")
+    * Adjectives -> Masculine Singular. Do NOT assign Article.
+	* Article -> Definite Article (e.g. "der", "le", "o") ONLY for Nouns.
 - Field Constraints:
     * Grammar: MUST be exactly one of ["Noun", "Verb", "Adjective", "Adverb", "Pronoun", "Phrase"].
-    * Article: Only for Nouns.
-    * Plural: Only for Nouns.
+    * Article: Only for Nouns. For all other types, use an empty string "".
+    * Plural: Only for Nouns. For all other types, use an empty string "".
     * Category: MUST be exactly one of ["People", "Living", "Food", "Motion", "Nature", "Body", "Time", "Abstract"].
     * Difficulty: CEFR (A1-C2).
     * Count: 0.
@@ -54,10 +54,10 @@ You are a professional Lexicographer. Your goal is to split a raw word list into
     {
     "staged": {
         "approved": [
-            {"Word": "hablar", "Article": "-", "English": "to speak", "Plural": "-", "Grammar": "Verb", "Category": "Motion", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "hablar", "Article": "", "English": "to speak", "Plural": "", "Grammar": "Verb", "Category": "Motion", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
             {"Word": "perro", "Article": "el", "English": "dog", "Plural": "perros", "Grammar": "Noun", "Category": "Nature", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
-            {"Word": "bueno", "Article": "-", "English": "good", "Plural": "-", "Grammar": "Adjective", "Category": "Abstract", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
-            {"Word": "en", "Article": "-", "English": ["in", "on"], "Plural": "-", "Grammar": "Preposition", "Category": "Abstract", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0}
+            {"Word": "bueno", "Article": "", "English": "good", "Plural": "buenos", "Grammar": "Adjective", "Category": "Abstract", "Difficulty": "A1", "Count": 0, "SuccessRate": 0.0},
+            {"Word": "rapidamente", "Article": "", "English": "quickly", "Plural": "", "Grammar": "Adverb", "Category": "Motion", "Difficulty": "A2", "Count": 0, "SuccessRate": 0.0}
         ],
         "disapproved": ["Madrid", "cinco"]
     }
