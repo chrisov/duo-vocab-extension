@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import tempfile
 from pathlib import Path
 from flask import request
 
@@ -96,10 +98,35 @@ def write_data_to_json(filepath: str, data: dict):
 	except KeyError:
 		data_path = (PROJECT_ROOT / filepath).resolve()
 
-	## Writes to the file
-	with open(data_path, "w", encoding='utf-8') as f:
-		json.dump(data, f, indent=2, ensure_ascii=False)
-   
+	## Writes to the file atomically: write to a temp file then replace
+	data_path.parent.mkdir(parents=True, exist_ok=True)
+	tmp_fd = None
+	tmp_path = None
+	try:
+		# Create temp file in the same directory to ensure os.replace is atomic
+		fd, tmp_path = tempfile.mkstemp(dir=str(data_path.parent), prefix=data_path.name, suffix='.tmp')
+		tmp_fd = os.fdopen(fd, 'w', encoding='utf-8')
+		json.dump(data, tmp_fd, indent=2, ensure_ascii=False)
+		tmp_fd.flush()
+		os.fsync(tmp_fd.fileno())
+		tmp_fd.close()
+		tmp_fd = None
+		# Atomic replace
+		os.replace(tmp_path, str(data_path))
+	except Exception:
+		# Clean up temp file on error
+		if tmp_fd is not None:
+			try:
+				tmp_fd.close()
+			except Exception:
+				pass
+		if tmp_path and os.path.exists(tmp_path):
+			try:
+				os.remove(tmp_path)
+			except Exception:
+				pass
+		raise
+
    
 
 def parse_request(required: list[str], optional: list[str] | None = None) -> tuple:

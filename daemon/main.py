@@ -1,8 +1,6 @@
 from daemon.daemon_utils import get_active_session, process_flags
 from daemon.model import model_response, response_example
 from daemon.JSONVocab import JSONVocab
-# from daemon.staging import staging
-# from daemon.sql_utils import init_sql
 from daemon.logger import setup_loggin_config
 from app.server_utils import get_path
 import argparse
@@ -10,6 +8,8 @@ import logging
 import json
 import time
 import os
+import signal
+import threading
 
 setup_loggin_config("DAEMON")
 logger = logging.getLogger(__name__) 
@@ -66,7 +66,7 @@ def	_process_model_response(obj: JSONVocab, new_dict: dict):
 
 
 
-def _process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
+def _process_scraped_vocabulary(obj: JSONVocab, test_mode: bool) -> bool:
 
 	## Call the LLM
 	if test_mode == False:
@@ -76,18 +76,18 @@ def _process_scraped_vocabulary(obj: JSONVocab, test_mode: bool = False):
 
 	## Check response's structural validity
 	if not response or not response.strip().startswith('{'):
-		logger.warning("LLM: Invalid response, skipping")
-		return
+		logger.warning("LLM: Invalid response, skipping...")
+		return False
 
 	## Process and persist the new staged vocabulary
 	new_staged = json.loads(response).get('staged', {})
 	_process_model_response(obj, new_staged)
+	return True
 
 
 
-def execute_daemon(filepath: str, args: argparse.Namespace):
+def execute_daemon(filepath: str, args: argparse.Namespace, stop_event: threading.Event):
 	logger.info("Init SQL engine")
-	conn = init_sql()
 
 	abs_path = get_path(filepath)
 	try:
@@ -96,33 +96,51 @@ def execute_daemon(filepath: str, args: argparse.Namespace):
 		logger.warning(f"'{abs_path}': File not found")
 		last_modific = 0
 
-	try:
-		while True:
+	while not stop_event.is_set():
+		try:
+			current_modific = os.path.getmtime(abs_path)
+		except FileNotFoundError:
+			logger.warning(f"'{abs_path}': File not found")
+			current_modific = 0
+
+		if current_modific > last_modific:
+			last_modific = current_modific
+
+			## Process the scraped vocabulary into the 'staged' property
 			try:
-				current_modific = os.path.getmtime(abs_path)
-			except FileNotFoundError:
-				logger.warning(f"'{abs_path}': File not found")
-				current_modific = 0
-
-			if current_modific > last_modific:
-				last_modific = current_modific
-
-				## Process the scraped vocabulary into the 'staged' property
-				try:
-					obj = JSONVocab(filepath, get_active_session())
-					if obj.get_scraped_vocab() != []:
+				obj = JSONVocab(filepath, get_active_session())
+				if obj.get_scraped_vocab() != [] and _process_scraped_vocabulary(obj, args.test_mode) == True:
 						logger.info(f"'{abs_path}': Processing changes...")
-						_process_scraped_vocabulary(obj, args.test_mode)
 						obj.write_data_to_json()
 						logger.info("'scraped' vocabulary processed successfully")
-						# staging(conn, obj)
-				except Exception as e:
-					logger.error(f"Daemon processing: {str(e)}")
-			time.sleep(POLL_INTERVAL)
-	finally:
-		logger.info("Disconnecting from DB...")
-		conn.close()
+			except Exception as e:
+				logger.error(f"Daemon processing: {str(e)}")
+		
+		# Sleep in small increments so we can respond quickly to shutdown
+		for _ in range(int(POLL_INTERVAL * 10)):
+			if stop_event.is_set():
+				break
+			time.sleep(0.1)
+
+	logger.info("Daemon shutting down gracefully")
+
+
 
 if __name__ == "__main__":
 	args = process_flags()
-	execute_daemon("VOCAB_PATH", args)
+	logger.debug(f"Test Flag: {args.test_mode}")
+
+	stop_event = threading.Event()
+
+	def _signal_handler(signum, frame):
+		logger.info(f"Received signal {signum}; initiating shutdown...")
+		stop_event.set()
+
+	# Register handlers for SIGINT and SIGTERM. SIGKILL cannot be caught.
+	signal.signal(signal.SIGINT, _signal_handler)
+	signal.signal(signal.SIGTERM, _signal_handler)
+	# On Windows, optionally handle SIGBREAK
+	if hasattr(signal, "SIGBREAK"):
+		signal.signal(signal.SIGBREAK, _signal_handler)
+
+	execute_daemon("VOCAB_PATH", args, stop_event)
